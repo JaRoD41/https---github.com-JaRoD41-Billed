@@ -40,6 +40,7 @@ export default class {
 				.then((snapshot) => {
 					const bills = snapshot.map((doc) => {
 						try {
+							console.log('doc :', doc)
 							return {
 								...doc,
 								date: formatDate(doc.date),
@@ -57,9 +58,6 @@ export default class {
 						}
 					})
 					console.log('length', bills.length)
-					// j'ajoute un tri par date décroissante afin d'avoir les dernières factures en premier et passer le test
-					bills.sort((a, b) => (a.date < b.date ? 1 : -1))
-					console.log('bills :', bills);
 					return bills
 				})
 		}
