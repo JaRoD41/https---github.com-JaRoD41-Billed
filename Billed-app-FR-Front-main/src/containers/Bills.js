@@ -43,7 +43,6 @@ export default class {
 						.sort((a, b) => new Date(b.date) - new Date(a.date))
 						.map((doc) => {
 							try {
-								console.log('doc :', doc)
 								return {
 									...doc,
 									date: formatDate(doc.date),
