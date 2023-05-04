@@ -17,37 +17,37 @@ export default class NewBill {
 	}
 	handleChangeFile = (e) => {
 		e.preventDefault()
+		// Bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
+
 		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-		if (file.type !== 'image/png' && file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
-			// J'affiiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
-			alert(
-				"Le format de la pièce jointe n'est pas valide. Veuillez sélectionner un fichier au format png, jpeg ou jpg."
-			)
-			return
-		}
 		const filePath = e.target.value.split(/\\/g)
 		const fileName = filePath[filePath.length - 1]
 		const formData = new FormData()
 		const email = JSON.parse(localStorage.getItem('user')).email
-
 		formData.append('file', file)
 		formData.append('email', email)
-
-		this.store
-			.bills()
-			.create({
-				data: formData,
-				headers: {
-					noContentType: true,
-				},
-			})
-			.then(({ fileUrl, key }) => {
-				console.log('file url :', fileUrl)
-				this.billId = key
-				this.fileUrl = fileUrl
-				this.fileName = fileName
-			})
-			.catch((error) => console.error(error))
+		if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
+			this.store
+				.bills()
+				.create({
+					data: formData,
+					headers: {
+						noContentType: true,
+					},
+				})
+				.then(({ fileUrl, key }) => {
+					this.billId = key
+					this.fileUrl = fileUrl
+					this.fileName = fileName
+					console.log('file url :', this.fileName)
+				})
+				.catch((error) => console.error(error))
+		} else {
+			alert(
+				"Le format de la pièce jointe n'est pas valide. Veuillez sélectionner un fichier au format png, jpeg ou jpg."
+			)
+			e.target.value = ''
+		}
 	}
 	handleSubmit = (e) => {
 		e.preventDefault()
