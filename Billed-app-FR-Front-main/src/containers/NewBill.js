@@ -39,7 +39,7 @@ export default class NewBill {
 					this.billId = key
 					this.fileUrl = fileUrl
 					this.fileName = fileName
-					console.log('file url :', this.fileName)
+					console.log('file url :', this.fileUrl)
 				})
 				.catch((error) => console.error(error))
 		} else {
