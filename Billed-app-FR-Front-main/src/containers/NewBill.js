@@ -22,6 +22,7 @@ export default class NewBill {
 		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
 		console.log('e target file dans NewBill :' + e.target.value);
 		const filePath = e.target.value.split(/\\/g)
+		console.log('e target file dans NewBill :' + filePath)
 		const fileName = filePath[filePath.length - 1]
 		const formData = new FormData()
 		const email = JSON.parse(localStorage.getItem('user')).email
