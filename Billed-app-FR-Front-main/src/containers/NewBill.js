@@ -20,6 +20,7 @@ export default class NewBill {
 		// Bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
 
 		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+		console.log('e target file dans NewBill :' + e.target.value);
 		const filePath = e.target.value.split(/\\/g)
 		const fileName = filePath[filePath.length - 1]
 		const formData = new FormData()
