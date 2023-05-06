@@ -17,7 +17,7 @@ export default class NewBill {
 	}
 	handleChangeFile = (e) => {
 		e.preventDefault()
-		// Bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
+		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
 
 		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
 		console.log('e target file dans NewBill :' + e.target.value);

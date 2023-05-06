@@ -22,7 +22,7 @@ const row = (bill) => {
 const rows = (data) => {
 	return data && data.length
 		? data
-				// Bug 1 : je trie les factures par date de plus récente à plus ancienne avant le map afin de passer les tests
+				// Correction du bug 1 : je trie les factures par date de plus récente à plus ancienne avant le map afin de passer les tests
 				.sort((a, b) => new Date(b.date) - new Date(a.date))
 				.map((bill) => row(bill))
 				.join('')
