@@ -73,23 +73,19 @@ describe('Given I am connected as an Employee and I am on Bills page', () => {
 			})
 
 			$.fn.modal = jest.fn()
-			const handleClickIconEye = jest.fn(billsDom.handleClickIconEye)
+			const handleClickIconEye = jest.fn((e) => billsDom.handleClickIconEye(e.target))
 			const eye = screen.getAllByTestId('icon-eye')[0]
 			eye.addEventListener('click', handleClickIconEye)
 			userEvent.click(eye)
+			// La fonction handleClickIconEye doit être appelée
 			expect(handleClickIconEye).toHaveBeenCalled()
+			// La page affichée doit contenir le screenshot de la facture
+			expect(screen.getByAltText('Bill')).toBeTruthy()
+			expect(screen.getByText('Justificatif')).toBeTruthy()
 		})
 	})
 	describe('When I click on the new bill button', () => {
 		test('Then it should open the new bill page', () => {
-			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-			window.localStorage.setItem(
-				'user',
-				JSON.stringify({
-					type: 'Employee',
-				})
-			)
-			document.body.innerHTML = BillsUI({ data: bills.sort((a, b) => new Date(b.date) - new Date(a.date)) })
 			const onNavigate = (pathname) => {
 				document.body.innerHTML = ROUTES({ pathname })
 			}
@@ -102,11 +98,16 @@ describe('Given I am connected as an Employee and I am on Bills page', () => {
 			})
 
 			$.fn.modal = jest.fn() // Je simule le comportement de la fonction modal de bootstrap
-			const handleClickNewBill = jest.fn(billsDom.handleClickNewBill)
+			const handleClickNewBill = jest.fn((e) => billsDom.handleClickNewBill(e))
 			const buttonNewBill = screen.getByTestId('btn-new-bill')
 			buttonNewBill.addEventListener('click', handleClickNewBill)
 			userEvent.click(buttonNewBill)
+			// La fonction handleClickNewBill doit être appelée
 			expect(handleClickNewBill).toHaveBeenCalled()
+			// La page doit contenir le formulaire de création d'une facture
+			expect(screen.getByTestId('form-new-bill')).toBeTruthy()
+			// La page doit contenir le bouton de soumission du formulaire
+			expect(screen.getByTestId('form-new-bill')).toBeTruthy()
 		})
 	})
 })
