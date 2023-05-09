@@ -5,16 +5,16 @@
 import { screen, waitFor } from '@testing-library/dom'
 import BillsUI from '../views/BillsUI.js'
 import { bills } from '../fixtures/bills.js'
-import { ROUTES_PATH } from '../constants/routes.js'
+import { ROUTES_PATH, ROUTES } from '../constants/routes.js'
 import { localStorageMock } from '../__mocks__/localStorage.js'
-// import userEvent from '@testing-library/user-event'
-// import Bills from '../containers/Bills.js'
-// import mockStore from '../__mocks__/store.js'
+import userEvent from '@testing-library/user-event'
+import Bills from '../containers/Bills.js'
+import mockStore from '../__mocks__/store.js'
 
 import router from '../app/Router.js'
 
 // j'ai besoin de simuler l'API grace à la fonction mock qui va se substituer au fichier Store.js
-// jest.mock('../app/Store.js', () => mockStore)
+jest.mock('../app/Store.js', () => mockStore)
 
 describe('Given I am connected as an employee', () => {
 	describe('When I am on Bills Page', () => {
@@ -50,3 +50,63 @@ describe('Given I am connected as an employee', () => {
 
 // Ajout des tests unitaires pour parfaire la couverture de Bills.js
 
+describe('Given I am connected as an Employee and I am on Bills page', () => {
+	describe('When I click on the icon eye', () => {
+		test('Then a modal should open with a screenshot of the bill', () => {
+			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+			window.localStorage.setItem(
+				'user',
+				JSON.stringify({
+					type: 'Employee',
+				})
+			)
+			document.body.innerHTML = BillsUI({ data: bills.sort((a, b) => new Date(b.date) - new Date(a.date)) })
+			const onNavigate = (pathname) => {
+				document.body.innerHTML = ROUTES({ pathname })
+			}
+			// Je crée une instance de Bills pour créer une facture
+			const billsDom = new Bills({
+				document,
+				onNavigate,
+				store: mockStore,
+				localStorage: window.localStorage,
+			})
+
+			$.fn.modal = jest.fn()
+			const handleClickIconEye = jest.fn(billsDom.handleClickIconEye)
+			const eye = screen.getAllByTestId('icon-eye')[0]
+			eye.addEventListener('click', handleClickIconEye)
+			userEvent.click(eye)
+			expect(handleClickIconEye).toHaveBeenCalled()
+		})
+	})
+	describe('When I click on the new bill button', () => {
+		test('Then it should open the new bill page', () => {
+			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+			window.localStorage.setItem(
+				'user',
+				JSON.stringify({
+					type: 'Employee',
+				})
+			)
+			document.body.innerHTML = BillsUI({ data: bills.sort((a, b) => new Date(b.date) - new Date(a.date)) })
+			const onNavigate = (pathname) => {
+				document.body.innerHTML = ROUTES({ pathname })
+			}
+			// Je crée une instance de Bills pour créer une facture
+			const billsDom = new Bills({
+				document,
+				onNavigate,
+				store: mockStore,
+				localStorage: window.localStorage,
+			})
+
+			$.fn.modal = jest.fn() // Je simule le comportement de la fonction modal de bootstrap
+			const handleClickNewBill = jest.fn(billsDom.handleClickNewBill)
+			const buttonNewBill = screen.getByTestId('btn-new-bill')
+			buttonNewBill.addEventListener('click', handleClickNewBill)
+			userEvent.click(buttonNewBill)
+			expect(handleClickNewBill).toHaveBeenCalled()
+		})
+	})
+})
