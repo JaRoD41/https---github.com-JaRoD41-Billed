@@ -85,7 +85,7 @@ describe('Given I am connected as an Employee and I am on Bills page', () => {
 		})
 	})
 	describe('When I click on the new bill button', () => {
-		test('Then it should open the new bill page', () => {
+		test('Then it should open the newBill page', () => {
 			const onNavigate = (pathname) => {
 				document.body.innerHTML = ROUTES({ pathname })
 			}
@@ -93,7 +93,7 @@ describe('Given I am connected as an Employee and I am on Bills page', () => {
 			const billsDom = new Bills({
 				document,
 				onNavigate,
-				store: mockStore,
+				mockStore,
 				localStorage: window.localStorage,
 			})
 
