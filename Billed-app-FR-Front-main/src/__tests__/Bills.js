@@ -5,10 +5,16 @@
 import { screen, waitFor } from '@testing-library/dom'
 import BillsUI from '../views/BillsUI.js'
 import { bills } from '../fixtures/bills.js'
-import { ROUTES_PATH } from '../constants/routes.js'
+import { ROUTES_PATH, ROUTES } from '../constants/routes.js'
 import { localStorageMock } from '../__mocks__/localStorage.js'
+import userEvent from '@testing-library/user-event'
+import Bills from '../containers/Bills.js'
+import mockStore from '../__mocks__/mockStore.js'
 
 import router from '../app/Router.js'
+
+// j'ai besoin de simuler l'API grace à la fonction mock qui va se substituer au fichier Store.js
+jest.mock('../app/Store.js', () => mockStore)
 
 describe('Given I am connected as an employee', () => {
 	describe('When I am on Bills Page', () => {
