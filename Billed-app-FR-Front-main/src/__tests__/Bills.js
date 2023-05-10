@@ -149,6 +149,7 @@ describe('Given I am a user connected as Employee', () => {
 
 	// Tests de gestion d'erreurs
 	describe('When an error occurs', () => {
+		// J'initialise les données communes qui seront utilisées par les tests à suivre
 		beforeEach(() => {
 			jest.spyOn(mockStore, 'bills')
 			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
