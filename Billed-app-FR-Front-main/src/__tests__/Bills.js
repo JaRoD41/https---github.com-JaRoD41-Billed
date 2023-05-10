@@ -11,11 +11,16 @@ import userEvent from '@testing-library/user-event'
 import Bills from '../containers/Bills.js'
 import mockStore from '../__mocks__/store.js'
 import ErrorPage from '../views/ErrorPage.js'
+import { formatDate } from '../app/format.js'
+import { getBills } from '../containers/Bills.js'
 
 import router from '../app/Router.js'
 
 // j'ai besoin de simuler l'API grace à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
+jest.mock('../app/format.js', () => ({
+	formatDate: jest.fn(),
+}))
 
 describe('Given I am connected as an employee', () => {
 	describe('When I am on Bills Page', () => {
@@ -52,6 +57,7 @@ describe('Given I am connected as an employee', () => {
 // Ajout des tests unitaires pour parfaire la couverture de Bills.js
 
 describe('Given I am connected as an Employee and I am on Bills page', () => {
+	// Test d'event listener sur les icones oeil
 	describe('When I click on the icon eye', () => {
 		test('Then a modal should open with a screenshot of the bill', () => {
 			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -142,8 +148,8 @@ describe('Given I am a user connected as Employee', () => {
 			// Je simule la navigation vers la page Bills
 			window.onNavigate(ROUTES_PATH.Bills)
 
-			// Je m'assure que le composant est bien affiché en utilisant waitFor contenu dans testing-library (asynchronisme)
-			await waitFor(() => expect(screen.getByText('Mes notes de frais')).toBeTruthy())
+			// Je m'assure que le composant est bien affiché en utilisant waitFor contenu dans testing-library (asynchrone)
+			await waitFor(() => expect(screen.getByText('Envoyer une note de frais')).toBeTruthy())
 		})
 	})
 
@@ -156,7 +162,7 @@ describe('Given I am a user connected as Employee', () => {
 			window.localStorage.setItem(
 				'user',
 				JSON.stringify({
-					type: 'Admin',
+					type: 'Employee',
 					email: 'a@a',
 				})
 			)
