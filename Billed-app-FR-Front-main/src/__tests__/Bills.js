@@ -11,8 +11,6 @@ import userEvent from '@testing-library/user-event'
 import Bills from '../containers/Bills.js'
 import mockStore from '../__mocks__/store.js'
 import ErrorPage from '../views/ErrorPage.js'
-import { formatDate } from '../app/format.js'
-import { getBills } from '../containers/Bills.js'
 
 import router from '../app/Router.js'
 
