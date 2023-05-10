@@ -10,6 +10,7 @@ import { localStorageMock } from '../__mocks__/localStorage.js'
 import userEvent from '@testing-library/user-event'
 import Bills from '../containers/Bills.js'
 import mockStore from '../__mocks__/store.js'
+import ErrorPage from '../views/ErrorPage.js'
 
 import router from '../app/Router.js'
 
@@ -108,6 +109,91 @@ describe('Given I am connected as an Employee and I am on Bills page', () => {
 			expect(screen.getByTestId('form-new-bill')).toBeTruthy()
 			// La page doit contenir le bouton de soumission du formulaire
 			expect(screen.getByTestId('form-new-bill')).toBeTruthy()
+		})
+	})
+	// Je teste si la page d'erreur s'affiche bien en cas d'erreur
+	describe('When an error occurs on the Bills page', () => {
+		test('Then it should display an Error page', () => {
+			// Je simule une erreur
+			const error = new Error('Erreur de test')
+			// J'appelle la fonction avec l'erreur simulée
+			jest.mock('./ErrorPage.js', () => jest.fn())
+			const result = BillsUI({ error })
+			// Je vérifie que le résultat est celui attendu
+			expect(result).toEqual(ErrorPage(error))
+		})
+	})
+})
+
+// Ajout des tests d'intégration GET
+
+describe('Given I am a user connected as Employee', () => {
+	describe('When I navigate to Bills page', () => {
+		// Je simule une requête GET avec succès afin d'obtenir la liste des factures
+		test('Then bills are fetched from mock API GET', async () => {
+			localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+
+			// Je simule une navigation html
+			const root = document.createElement('div')
+			root.setAttribute('id', 'root')
+			document.body.append(root)
+			// j'utilise le router pour simuler la navigation
+			router()
+			// Je simule la navigation vers la page Bills
+			window.onNavigate(ROUTES_PATH.Bills)
+
+			// Je m'assure que le composant est bien affiché en utilisant waitFor contenu dans testing-library (asynchronisme)
+			await waitFor(() => expect(screen.getByText('Mes notes de frais')).toBeTruthy())
+		})
+	})
+
+	// Tests de gestion d'erreurs
+	describe('When an error occurs', () => {
+		beforeEach(() => {
+			jest.spyOn(mockStore, 'bills')
+			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+			window.localStorage.setItem(
+				'user',
+				JSON.stringify({
+					type: 'Admin',
+					email: 'a@a',
+				})
+			)
+			const root = document.createElement('div')
+			root.setAttribute('id', 'root')
+			document.body.appendChild(root)
+			router()
+		})
+		// Je simule une requête GET qui échoue afin de tester l'affichage d'un message d'erreur 404
+		test('Then the app fetches bills from an API and fails with 404 message error', async () => {
+			// j'utilise mockImplementationOnce pour simuler une erreur 404
+			mockStore.bills.mockImplementationOnce(() => {
+				return {
+					list: () => {
+						return Promise.reject(new Error('Erreur 404'))
+					},
+				}
+			})
+			window.onNavigate(ROUTES_PATH.Bills)
+			await new Promise(process.nextTick)
+			const message = await screen.getByText(/Erreur 404/)
+			expect(message).toBeTruthy()
+		})
+		// Je simule une requête GET qui échoue afin de tester l'affichage d'un message d'erreur 500
+		test('Then the app fetches bills from an API and fails with 500 message error', async () => {
+			// j'utilise mockImplementationOnce pour simuler une erreur 500
+			mockStore.bills.mockImplementationOnce(() => {
+				return {
+					list: () => {
+						return Promise.reject(new Error('Erreur 500'))
+					},
+				}
+			})
+
+			window.onNavigate(ROUTES_PATH.Bills)
+			await new Promise(process.nextTick)
+			const message = await screen.getByText(/Erreur 500/)
+			expect(message).toBeTruthy()
 		})
 	})
 })
