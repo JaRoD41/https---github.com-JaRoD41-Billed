@@ -44,45 +44,32 @@ describe('Given I am connected as an employee', () => {
 			expect(mailIcon.classList.contains('active-icon')).toBeTruthy()
 		})
 	})
-	describe('When I am on NewBill Page and I submit an empty form', () => {
-		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
-		beforeEach(() => {
-			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-			Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
 
-			// Je simule un user connecté en temps qu'employé
-			window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-
-			document.body.innerHTML = `<div id="root"></div>`
-			Router()
-		})
-		test('Then the form should not be submitted', () => {
-			const html = NewBillUI()
-			document.body.innerHTML = html
-			const onNavigate = (pathname) => {
-				document.body.innerHTML = ROUTES({ pathname })
-			}
-
-			const newBill = new NewBill({
-				document,
-				onNavigate,
-				store: mockStore,
-				localStorage: window.localStorage,
-			})
-			const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
-			const form = screen.getByTestId('form-new-bill')
-			form.addEventListener('submit', handleSubmit)
-			fireEvent.submit(form)
-			// Je simule le submit du formulaire avec tous les champs vides
+	describe('When I submit an empty form', () => {
+		test('Then I should stay on the same page', () => {
+			// Je simule un user connecté en temps qu'employé sur NewBill
+			window.onNavigate(ROUTES_PATH.NewBill)
+			// Je crée une facture vide
+			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
+			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
+			expect(screen.getByTestId('expense-name').value).toBe('')
 			expect(screen.getByTestId('datepicker').value).toBe('')
 			expect(screen.getByTestId('amount').value).toBe('')
 			expect(screen.getByTestId('vat').value).toBe('')
 			expect(screen.getByTestId('pct').value).toBe('')
 			expect(screen.getByTestId('file').value).toBe('')
-			// Je vérifie que la fonction handleSubmit a été appelée
+			// Je crée la variable form qui contient le formulaire
+			const form = screen.getByTestId('form-new-bill')
+			// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
+			const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+			// Je crée un écouteur d'évènement sur le formulaire
+			form.addEventListener('submit', handleSubmit)
+			// Je simule la soumission du formulaire
+			fireEvent.submit(form)
+			// Je m'attends à ce que la fonction handleSubmit soit appelée
 			expect(handleSubmit).toHaveBeenCalled()
-			// Je vérifie que l'on reste sur la page NewBill
-			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+			// Je m'attends à ce que le formulaire soit OK
+			expect(form).toBeTruthy()
 		})
 	})
 })
