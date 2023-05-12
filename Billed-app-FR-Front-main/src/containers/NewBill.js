@@ -9,7 +9,7 @@ export default class NewBill {
 		const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`)
 		formNewBill.addEventListener('submit', this.handleSubmit)
 		const file = this.document.querySelector(`input[data-testid="file"]`)
-		
+
 		file.addEventListener('change', this.handleChangeFile)
 		this.fileUrl = null
 		this.fileName = null
@@ -45,10 +45,7 @@ export default class NewBill {
 				})
 				.catch((error) => console.error(error))
 		} else {
-			// alert(
-			// 	"Le format de la pièce jointe n'est pas valide. Veuillez sélectionner un fichier au format png, jpeg ou jpg."
-			// )
-			emailError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
+			this.showFileError(e)
 			e.target.value = ''
 		}
 	}
@@ -87,5 +84,12 @@ export default class NewBill {
 				})
 				.catch((error) => console.error(error))
 		}
+	}
+
+	// Ajout d'une méthode d'affichage d'erreur si mauvais format de fichier
+	showFileError = (e) => {
+		e.preventDefault()
+		const emailError = this.document.getElementById('fileErrorMsg')
+		emailError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
 	}
 }

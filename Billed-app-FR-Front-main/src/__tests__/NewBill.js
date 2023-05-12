@@ -73,26 +73,51 @@ describe('Given I am connected as an employee', () => {
 		})
 	})
 	describe('When I submit a form with an incorrect file extension', () => {
-		test('Then an error message should be displayed and the file form should be reset', () => {
-			// Je simule un user connecté en temps qu'employé sur NewBill
-			window.onNavigate(ROUTES_PATH.NewBill)
-			// Je crée une facture vide
-			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
+		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
+		beforeEach(() => {
+			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+			Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
+
+			// Je simule un user connecté en temps qu'employé
+			window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+
+			document.body.innerHTML = `<div id="root"></div>`
+			Router()
+		})
+		// Je crée un mock de la fonction console.error pour éviter d'afficher les erreurs dans le terminal
+		afterAll(() => {
+			console.error.mockRestore()
+		})
+		test('Then an error message should be displayed and the file form should be reset', async () => {
 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
-			//const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-			const wrongFile = new File(['hello'], 'hello.png', { type: 'image/webp' })
+			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
+			// Je simule la fonction handleChangeFile qui est appelée lors du changement de fichier
+			const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
+			// Je crée la variable inputFile qui contient le champ file
+			const inputFile = screen.getByTestId('file')
+			// Je crée un fichier incorrect
+			const wrongFile = new File(['img'], 'justif.webp', { type: 'image/webp' })
+			// Je crée un écouteur d'évènement sur le champ file
+			inputFile.addEventListener('change', handleChangeFile)
+			// Je simule le changement de fichier
+			await waitFor(() => {
+				userEvent.upload(inputFile, wrongFile)
+			})
 			// Je crée la variable form qui contient le formulaire
 			const form = screen.getByTestId('form-new-bill')
 			// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
 			const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
 			// Je crée un écouteur d'évènement sur le formulaire
 			form.addEventListener('submit', handleSubmit)
+
 			// Je simule la soumission du formulaire
-			fireEvent.submit(form)
-			// Je m'attends à ce que la fonction handleSubmit soit appelée
-			expect(handleSubmit).toHaveBeenCalled()
+			// fireEvent.submit(form)
 			// Je m'attends à ce que le champ file contienne le fichier incorrect
-			expect(screen.getByTestId('file').toBe(wrongFile))
+			expect(inputFile.files[0].name).toBe('justif.webp')
+			// Je m'attends à ce que la fonction handleChangeFile soit appelée
+			expect(handleChangeFile).toBeCalled()
+			// Je m'attends à ce que la nouvelle facture avec la mauvaise pièce jointe ne soit pas validée
+			expect(newBill.validFile).not.toBeTruthy()
 			// Je m'attends à ce que le message d'erreur soit affiché
 			expect(screen.getByText('Veuillez sélectionner un fichier au format png, jpeg ou jpg)')).toBeTruthy()
 		})
