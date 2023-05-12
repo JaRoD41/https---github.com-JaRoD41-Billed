@@ -21,6 +21,11 @@ export default class NewBill {
 		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
 
 		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+		// J'ajoute une condition pour vérifier qu'il y a bien une pièce jointe
+		if (!file) {
+			// Si aucun fichier n'est sélectionné, ne rien faire
+			return
+		}
 		const filePath = e.target.value.split(/\\/g)
 		const fileName = filePath[filePath.length - 1]
 		const formData = new FormData()
