@@ -20,7 +20,8 @@ export default class NewBill {
 		e.preventDefault()
 		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
 
-		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+		// const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+		const file = e.target.files[0]
 		// J'ajoute une condition pour vérifier qu'il y a bien une pièce jointe
 		if (!file) {
 			// Si aucun fichier n'est sélectionné, ne rien faire
@@ -78,6 +79,7 @@ export default class NewBill {
 		}
 		this.updateBill(bill)
 		this.onNavigate(ROUTES_PATH['Bills'])
+		console.log('bill :', bill);
 	}
 
 	// not need to cover this function by tests

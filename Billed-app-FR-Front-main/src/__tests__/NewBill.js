@@ -15,10 +15,6 @@ import BillsUI from '../views/BillsUI.js'
 // Je simule l'API grâce à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
 
-// const onNavigate = (pathname) => {
-// 	document.body.innerHTML = ROUTES({ pathname })
-// }
-
 describe('Given I am connected as an employee', () => {
 	describe('When I am on NewBill Page', () => {
 		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
@@ -135,7 +131,7 @@ describe('Given I am connected as an employee', () => {
 		afterAll(() => {
 			console.error.mockRestore()
 		})
-		test('Then the file should be uploaded and the form should be reset', async () => {
+		test('Then the file should be uploaded', async () => {
 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
 			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
 			// Je crée un mock de la fonction create de bills
