@@ -14,20 +14,25 @@ import BillsUI from '../views/BillsUI.js'
 
 // Je simule l'API grâce à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
+const onNavigate = (pathname) => {
+	document.body.innerHTML = ROUTES({ pathname })
+}
+window.alert = jest.fn()
+
+// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
+beforeEach(() => {
+	Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+	Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
+
+	// Je simule un user connecté en temps qu'employé
+	window.localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+
+	document.body.innerHTML = `<div id="root"></div>`
+	Router()
+})
 
 describe('Given I am connected as an employee', () => {
 	describe('When I am on NewBill Page', () => {
-		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
-		beforeEach(() => {
-			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-			Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
-
-			// Je simule un user connecté en temps qu'employé
-			window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-
-			document.body.innerHTML = `<div id="root"></div>`
-			Router()
-		})
 		// Test d'affichage de la page NewBill
 		test('Then the NewBill form appears', () => {
 			const html = NewBillUI()
@@ -78,10 +83,7 @@ describe('Given I am connected as an employee', () => {
 			document.body.innerHTML = `<div id="root"></div>`
 			Router()
 		})
-		// Je crée un mock de la fonction console.error pour éviter d'afficher les erreurs dans le terminal
-		afterAll(() => {
-			console.error.mockRestore()
-		})
+
 		test('Then an error message should be displayed and the file form should be reset', async () => {
 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
 			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
@@ -116,6 +118,7 @@ describe('Given I am connected as an employee', () => {
 			expect(newBill.validFile).not.toBeTruthy()
 		})
 	})
+
 	// Je teste l'envoi du formulaire avec un fichier correct
 	describe('When I submit a form with a correct file extension', () => {
 		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
@@ -156,6 +159,80 @@ describe('Given I am connected as an employee', () => {
 			expect(createBillMock).toHaveBeenCalledWith({
 				data: expect.any(FormData),
 				headers: { noContentType: true },
+			})
+		})
+	})
+})
+// Ajout des tests d'intégration POST
+
+describe('Given I am a user connected as Employee', () => {
+	describe('When I create new bill', () => {
+		test('send bill to mock API POST', async () => {
+			localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+			const root = document.createElement('div')
+			root.setAttribute('id', 'root')
+			document.body.append(root)
+			Router()
+			window.onNavigate(ROUTES_PATH.NewBill)
+			jest.spyOn(mockStore, 'bills')
+
+			mockStore.bills.mockImplementationOnce(() => {
+				return {
+					create: (bill) => {
+						return Promise.resolve()
+					},
+				}
+			})
+
+			await new Promise(process.nextTick)
+			expect(screen.getByText('Mes notes de frais')).toBeTruthy()
+		})
+		describe('When an error occurs on API', () => {
+			test('send bill to mock API POST', async () => {
+				localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+				const root = document.createElement('div')
+				root.setAttribute('id', 'root')
+				document.body.append(root)
+				Router()
+				window.onNavigate(ROUTES_PATH.NewBill)
+				jest.spyOn(mockStore, 'bills')
+
+				mockStore.bills.mockImplementationOnce(() => {
+					return {
+						create: (bill) => {
+							return Promise.reject(new Error('Erreur 404'))
+						},
+					}
+				})
+
+				await new Promise(process.nextTick)
+				const html = BillsUI({ error: 'Erreur 404' })
+				document.body.innerHTML = html
+				const message = await screen.getByText(/Erreur 404/)
+				expect(message).toBeTruthy()
+			})
+			test('send bill to mock API POST', async () => {
+				localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+				const root = document.createElement('div')
+				root.setAttribute('id', 'root')
+				document.body.append(root)
+				Router()
+				window.onNavigate(ROUTES_PATH.NewBill)
+				jest.spyOn(mockStore, 'bills')
+
+				mockStore.bills.mockImplementationOnce(() => {
+					return {
+						create: (bill) => {
+							return Promise.reject(new Error('Erreur 500'))
+						},
+					}
+				})
+
+				await new Promise(process.nextTick)
+				const html = BillsUI({ error: 'Erreur 500' })
+				document.body.innerHTML = html
+				const message = await screen.getByText(/Erreur 500/)
+				expect(message).toBeTruthy()
 			})
 		})
 	})
