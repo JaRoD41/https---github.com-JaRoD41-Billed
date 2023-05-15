@@ -84,8 +84,8 @@ export default class NewBill {
 	// Ajout d'une méthode d'affichage d'erreur si mauvais format de fichier
 	showFileError = (e) => {
 		e.preventDefault()
-		const emailError = this.document.getElementById('fileErrorMsg')
-		emailError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
+		const extensionError = this.document.getElementById('fileErrorMsg')
+		extensionError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
 	}
 
 	// not need to cover this function by tests

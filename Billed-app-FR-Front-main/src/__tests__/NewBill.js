@@ -3,6 +3,7 @@
  */
 
 import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
 import mockStore from '../__mocks__/store'
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import NewBillUI from '../views/NewBillUI.js'
@@ -10,13 +11,11 @@ import NewBill from '../containers/NewBill.js'
 import { localStorageMock } from '../__mocks__/localStorage'
 import { ROUTES, ROUTES_PATH } from '../constants/routes'
 import Router from '../app/Router'
+import { bills } from '../fixtures/bills'
 import BillsUI from '../views/BillsUI.js'
 
 // Je simule l'API grâce à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
-
-const testHtml = NewBillUI()
-console.log('html :', testHtml)
 
 const onNavigate = (pathname) => {
 	document.body.innerHTML = ROUTES({ pathname })
@@ -31,6 +30,11 @@ window.localStorage.setItem(
 	})
 )
 window.alert = jest.fn()
+
+afterEach(() => {
+	jest.resetAllMocks()
+	document.body.innerHTML = ''
+})
 
 describe('Given I am connected as an employee', () => {
 	describe('When I am on NewBill Page', () => {
@@ -162,23 +166,53 @@ describe('Given I am connected as an employee', () => {
 
 	// Ajout des tests d'intégration POST
 
-	// describe('When I submit a new bill with all fields OK', () => {
-	// 	test('Then It should create a bill', () => {
-	// 		document.body.innerHTML = testHtml
-	// 		const onNavigate = (pathname) => {
-	// 			document.body.innerHTML = ROUTES({ pathname })
-	// 		}
-	// 		const newBill = new NewBill({
-	// 			document,
-	// 			onNavigate,
-	// 			store: mockStore,
-	// 			localStorage: window.localStorage,
-	// 		})
-	// 		const handleSubmit = jest.fn(newBill.handleSubmit)
-	// 		const form = screen.getByTestId('form-new-bill')
-	// 		form.addEventListener('submit', handleSubmit)
-	// 		fireEvent.submit(form)
-	// 		expect(handleSubmit).toHaveBeenCalled()
-	// 	})
-	// })
+	describe('When I submit a new bill with all fields OK', () => {
+		test('Then It should create a bill', async () => {
+			localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+			const root = document.createElement('div')
+			root.setAttribute('id', 'root')
+			document.body.append(root)
+			Router()
+
+			window.onNavigate(ROUTES_PATH.NewBill)
+
+			jest.spyOn(mockStore, 'bills')
+
+			const newBill = new NewBill({
+				document,
+				onNavigate,
+				store: mockStore,
+				localStorage: window.localStorage,
+			})
+
+			const handleChangeFile = jest.spyOn(newBill, 'handleChangeFile')
+			const imageInput = screen.getByTestId('file')
+			const fileValidation = jest.spyOn(newBill, 'fileValidation')
+
+			imageInput.addEventListener('change', handleChangeFile)
+
+			fireEvent.change(imageInput, {
+				target: {
+					files: [
+						new File(['image'], 'image.jpg', {
+							type: 'image/jpg',
+						}),
+					],
+				},
+			})
+
+			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+			// const newBill = new NewBill({
+			// 	document,
+			// 	onNavigate,
+			// 	store: mockStore,
+			// 	localStorage: window.localStorage,
+			// })
+			// const handleSubmit = jest.fn(newBill.handleSubmit)
+			// const form = screen.getByTestId('form-new-bill')
+			// form.addEventListener('submit', handleSubmit)
+			// fireEvent.submit(form)
+			// expect(handleSubmit).toHaveBeenCalled()
+		})
+	})
 })
