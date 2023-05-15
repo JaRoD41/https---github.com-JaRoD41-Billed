@@ -15,16 +15,30 @@ import BillsUI from '../views/BillsUI.js'
 // Je simule l'API grâce à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
 
+const testHtml = NewBillUI()
+console.log('html :', testHtml)
+
+const onNavigate = (pathname) => {
+	document.body.innerHTML = ROUTES({ pathname })
+}
+
+Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+window.localStorage.setItem(
+	'user',
+	JSON.stringify({
+		type: 'Employee',
+		email: 'a@a',
+	})
+)
+window.alert = jest.fn()
+
 describe('Given I am connected as an employee', () => {
 	describe('When I am on NewBill Page', () => {
-		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
 		beforeEach(() => {
 			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 			Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
 
-			// Je simule un user connecté en temps qu'employé
-			window.localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
-
+			window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
 			document.body.innerHTML = `<div id="root"></div>`
 			Router()
 		})
@@ -32,7 +46,7 @@ describe('Given I am connected as an employee', () => {
 		test('Then the NewBill form appears', () => {
 			const html = NewBillUI()
 			document.body.innerHTML = html
-			expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
+			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
 		})
 		// Test de la présence de l'icone de nouvelle note de frais
 		test('Then the mail icon in vertical layout should be highlighted', () => {
@@ -68,7 +82,8 @@ describe('Given I am connected as an employee', () => {
 			expect(form).toBeTruthy()
 		})
 	})
-	describe('When I submit a form with an incorrect file extension', () => {
+
+	describe('When I submit a file to join to the NewBill form', () => {
 		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
 		beforeEach(() => {
 			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -79,7 +94,7 @@ describe('Given I am connected as an employee', () => {
 			Router()
 		})
 
-		test('Then an error message should be displayed and the file form should be reset', async () => {
+		test('Then an error message should be displayed and the file form should be reset in case of wrong extension', async () => {
 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
 			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
 			// Je crée un spy sur la fonction showFileError
@@ -112,24 +127,11 @@ describe('Given I am connected as an employee', () => {
 			// Je m'attends à ce que la nouvelle facture avec la mauvaise pièce jointe ne soit pas validée
 			expect(newBill.validFile).not.toBeTruthy()
 		})
-	})
 
-	// Je teste l'envoi du formulaire avec un fichier correct
-	describe('When I submit a form with a correct file extension', () => {
-		// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
-		beforeEach(() => {
-			Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-			Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
-			// Je simule un user connecté en temps qu'employé
-			window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-			document.body.innerHTML = `<div id="root"></div>`
-			Router()
-		})
-		// Je crée un mock de la fonction console.error pour éviter d'afficher les erreurs dans le terminal
-		afterAll(() => {
-			console.error.mockRestore()
-		})
-		test('Then the file should be uploaded', async () => {
+		// Je teste l'envoi du formulaire avec un fichier correct
+		test('Then the file should be uploaded in case of valid extension', async () => {
+			// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
+
 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
 			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
 			// Je crée un mock de la fonction create de bills
@@ -157,5 +159,26 @@ describe('Given I am connected as an employee', () => {
 			})
 		})
 	})
+
+	// Ajout des tests d'intégration POST
+
+	// describe('When I submit a new bill with all fields OK', () => {
+	// 	test('Then It should create a bill', () => {
+	// 		document.body.innerHTML = testHtml
+	// 		const onNavigate = (pathname) => {
+	// 			document.body.innerHTML = ROUTES({ pathname })
+	// 		}
+	// 		const newBill = new NewBill({
+	// 			document,
+	// 			onNavigate,
+	// 			store: mockStore,
+	// 			localStorage: window.localStorage,
+	// 		})
+	// 		const handleSubmit = jest.fn(newBill.handleSubmit)
+	// 		const form = screen.getByTestId('form-new-bill')
+	// 		form.addEventListener('submit', handleSubmit)
+	// 		fireEvent.submit(form)
+	// 		expect(handleSubmit).toHaveBeenCalled()
+	// 	})
+	// })
 })
-// Ajout des tests d'intégration POST

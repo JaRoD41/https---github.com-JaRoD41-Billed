@@ -79,10 +79,17 @@ export default class NewBill {
 		}
 		this.updateBill(bill)
 		this.onNavigate(ROUTES_PATH['Bills'])
-		console.log('bill :', bill);
+	}
+
+	// Ajout d'une méthode d'affichage d'erreur si mauvais format de fichier
+	showFileError = (e) => {
+		e.preventDefault()
+		const emailError = this.document.getElementById('fileErrorMsg')
+		emailError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
 	}
 
 	// not need to cover this function by tests
+	/* istanbul ignore next */
 	updateBill = (bill) => {
 		if (this.store) {
 			this.store
@@ -93,12 +100,5 @@ export default class NewBill {
 				})
 				.catch((error) => console.error(error))
 		}
-	}
-
-	// Ajout d'une méthode d'affichage d'erreur si mauvais format de fichier
-	showFileError = (e) => {
-		e.preventDefault()
-		const emailError = this.document.getElementById('fileErrorMsg')
-		emailError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
 	}
 }
