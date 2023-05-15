@@ -31,11 +31,6 @@ window.localStorage.setItem(
 )
 window.alert = jest.fn()
 
-afterEach(() => {
-	jest.resetAllMocks()
-	document.body.innerHTML = ''
-})
-
 describe('Given I am connected as an employee', () => {
 	describe('When I am on NewBill Page', () => {
 		beforeEach(() => {
@@ -169,50 +164,65 @@ describe('Given I am connected as an employee', () => {
 	describe('When I submit a new bill with all fields OK', () => {
 		test('Then It should create a bill', async () => {
 			localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
-			const root = document.createElement('div')
-			root.setAttribute('id', 'root')
-			document.body.append(root)
-			Router()
+			const html = NewBillUI()
+			document.body.innerHTML = html
 
-			window.onNavigate(ROUTES_PATH.NewBill)
-
-			jest.spyOn(mockStore, 'bills')
+			// window.onNavigate(ROUTES_PATH.NewBill)
 
 			const newBill = new NewBill({
 				document,
-				onNavigate,
+				onNavigate: () => {},
 				store: mockStore,
 				localStorage: window.localStorage,
 			})
 
 			const handleChangeFile = jest.spyOn(newBill, 'handleChangeFile')
 			const imageInput = screen.getByTestId('file')
-			const fileValidation = jest.spyOn(newBill, 'fileValidation')
 
 			imageInput.addEventListener('change', handleChangeFile)
 
-			fireEvent.change(imageInput, {
-				target: {
-					files: [
-						new File(['image'], 'image.jpg', {
-							type: 'image/jpg',
-						}),
-					],
-				},
+			// expect(handleChangeFile).toHaveBeenCalled()
+			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+
+			const handleSubmit = jest.fn(newBill.handleSubmit)
+			const correctFile = new File(['img'], 'justif.png', { type: 'image/png' })
+
+			fireEvent.change(screen.getByTestId('expense-type'), {
+				target: { value: 'Transports' },
+			})
+			fireEvent.change(screen.getByTestId('expense-name'), {
+				target: { value: 'Vol Paris-New York' },
+			})
+			fireEvent.change(screen.getByTestId('datepicker'), {
+				target: { value: '2023-05-15' },
+			})
+			fireEvent.change(screen.getByTestId('amount'), {
+				target: { value: '1375' },
+			})
+			fireEvent.change(screen.getByTestId('vat'), {
+				target: { value: '20' },
+			})
+			fireEvent.change(screen.getByTestId('pct'), {
+				target: { value: '255' },
+			})
+			fireEvent.change(screen.getByTestId('commentary'), {
+				target: { value: 'Vol reunion client USA' },
+			})
+			// fireEvent.change(screen.getByTestId('file'), {
+			// 	target: { value: 'justif.png' },
+			// })
+
+			await waitFor(() => {
+				userEvent.upload(imageInput, correctFile)
 			})
 
-			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
-			// const newBill = new NewBill({
-			// 	document,
-			// 	onNavigate,
-			// 	store: mockStore,
-			// 	localStorage: window.localStorage,
-			// })
-			// const handleSubmit = jest.fn(newBill.handleSubmit)
-			// const form = screen.getByTestId('form-new-bill')
-			// form.addEventListener('submit', handleSubmit)
-			// fireEvent.submit(form)
+			const form = screen.getByTestId('form-new-bill')
+			form.addEventListener('submit', handleSubmit)
+			fireEvent.submit(form)
 			// expect(handleSubmit).toHaveBeenCalled()
+
+			console.log(mockStore.bills().update)
+			expect(mockStore.bills().update.mock.calls[0])
 		})
 	})
 })

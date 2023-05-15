@@ -111,8 +111,6 @@ describe('Given I am connected as an Employee and I am on Bills page', () => {
 			expect(handleClickNewBill).toHaveBeenCalled()
 			// La page doit contenir le formulaire de création d'une facture
 			expect(screen.getByTestId('form-new-bill')).toBeTruthy()
-			// La page doit contenir le bouton de soumission du formulaire
-			expect(screen.getByTestId('form-new-bill')).toBeTruthy()
 		})
 	})
 	// Je teste si la page d'erreur s'affiche bien en cas d'erreur
@@ -181,7 +179,7 @@ describe('Given I am a user connected as Employee', () => {
 			})
 			window.onNavigate(ROUTES_PATH.Bills)
 			await new Promise(process.nextTick)
-			const message = await screen.getByText(/Erreur 404/)
+			const message = screen.getByText(/Erreur 404/)
 			expect(message).toBeTruthy()
 		})
 		// Je simule une requête GET qui échoue afin de tester l'affichage d'un message d'erreur 500
@@ -197,7 +195,7 @@ describe('Given I am a user connected as Employee', () => {
 
 			window.onNavigate(ROUTES_PATH.Bills)
 			await new Promise(process.nextTick)
-			const message = await screen.getByText(/Erreur 500/)
+			const message = screen.getByText(/Erreur 500/)
 			expect(message).toBeTruthy()
 		})
 	})

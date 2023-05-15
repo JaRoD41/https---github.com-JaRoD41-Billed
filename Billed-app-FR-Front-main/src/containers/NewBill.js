@@ -31,8 +31,8 @@ export default class NewBill {
 		const fileName = filePath[filePath.length - 1]
 		const formData = new FormData()
 		const email = JSON.parse(localStorage.getItem('user')).email
-		const emailError = this.document.getElementById('fileErrorMsg')
-		emailError.innerHTML = ''
+		const fileErrorMsg = this.document.getElementById('fileErrorMsg')
+		fileErrorMsg.innerHTML = ''
 		formData.append('file', file)
 		formData.append('email', email)
 		if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
