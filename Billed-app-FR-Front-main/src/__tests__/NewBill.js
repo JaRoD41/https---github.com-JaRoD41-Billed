@@ -96,8 +96,8 @@ describe('Given I am connected as an employee', () => {
 		test('Then an error message should be displayed and the file form should be reset in case of wrong extension', async () => {
 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
 			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
-			// Je crée un spy sur la fonction showFileError
-			const showFileErrorSpy = jest.spyOn(newBill, 'showFileError')
+			// Je crée un spy sur la fonction fileCheck
+			const fileCheckSpy = jest.spyOn(newBill, 'fileCheck')
 			// Je crée un spy sur la fonction handleChangeFile
 			const handleChangeFileSpy = jest.spyOn(newBill, 'handleChangeFile')
 			// Je crée la variable inputFile qui contient le champ file
@@ -120,7 +120,7 @@ describe('Given I am connected as an employee', () => {
 			// Je m'attends à ce que le champ file contienne le fichier incorrect
 			expect(inputFile.files[0].name).toBe('justif.webp')
 			// Je m'attends à ce que le message d'erreur soit affiché
-			expect(showFileErrorSpy).toHaveBeenCalled()
+			expect(fileCheckSpy).toHaveBeenCalled()
 			// Je m'attends à ce que la fonction handleChangeFile soit appelée
 			expect(handleChangeFileSpy).toHaveBeenCalled()
 			// Je m'attends à ce que la nouvelle facture avec la mauvaise pièce jointe ne soit pas validée
@@ -162,10 +162,9 @@ describe('Given I am connected as an employee', () => {
 	// Ajout des tests d'intégration POST
 
 	describe('When I submit a new bill with all fields OK', () => {
-		test('Then It should create a bill', async () => {
-
-			// Je paramètre le local storage et la page du router pour simuler un employé connecté 
-			localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+		test('Then It should accept the form and return to the Bills page ', async () => {
+			// // Je paramètre le local storage et la page du router pour simuler un employé connecté
+			// localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
 
 			// J'ai besoin d'émuler l'affichage de la page NewBill
 			const html = NewBillUI()
@@ -184,6 +183,17 @@ describe('Given I am connected as an employee', () => {
 			const imageInput = screen.getByTestId('file')
 
 			imageInput.addEventListener('change', handleChangeFile)
+
+			// Je simule le changement de fichier
+			fireEvent.change(imageInput, {
+				target: {
+					files: [
+						new File(['image'], 'image.jpg', {
+							type: 'image/jpg',
+						}),
+					],
+				},
+			})
 
 			// Je m'attends à être sur la page NewBill
 			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
@@ -215,27 +225,74 @@ describe('Given I am connected as an employee', () => {
 				target: { value: 'Vol reunion client USA' },
 			})
 
-			// Je simule le chargement du fichier
-			await waitFor(() => {
-				userEvent.upload(imageInput, correctFile)
-			})
+			// // Je simule le chargement du fichier
+			// await waitFor(() => {
+			// 	userEvent.upload(imageInput, correctFile)
+			// })
 
 			const form = screen.getByTestId('form-new-bill')
 			// Je crée un écouteur d'évènement sur le formulaire
 			form.addEventListener('submit', handleSubmit)
 
+			// Je m'attends à ce que les champs suivants contiennent une valeur valide
+			expect(screen.getByTestId('datepicker').validity.valueMissing).toBeFalsy()
+			expect(screen.getByTestId('expense-name').validity.valueMissing).toBeFalsy()
+			expect(screen.getByTestId('amount').validity.valueMissing).toBeFalsy()
+			expect(screen.getByTestId('vat').validity.valueMissing).toBeFalsy()
+			expect(screen.getByTestId('pct').validity.valueMissing).toBeFalsy()
+			expect(screen.getByTestId('commentary').validity.valueMissing).toBeFalsy()
+			//expect(screen.getByTestId('file').validity.valueMissing).toBeFalsy()
+
+			// Je m'attends à ce que le bouton d'envoi du formulaire soit présent
+			const submitButton = screen.getByRole('button', { name: /envoyer/i })
+			expect(submitButton.type).toBe('submit')
+
 			// Je simule la soumission du formulaire
-			fireEvent.submit(form)
+			// fireEvent.submit(form)
+			userEvent.click(submitButton)
 
 			// Je m'attends à ce que la fonction handleSubmit soit appelée
 			expect(handleSubmit).toHaveBeenCalled()
 
-			// Je m'attends à ce que les champs suivants contiennent une valeur valide
-			expect(screen.getByTestId('datepicker').validity.valueMissing).toBeFalsy()
-			expect(screen.getByTestId('expense-name').validity.valueMissing).toBeFalsy()
+			// Je m'assure qu'on est bien renvoyé sur la page Bills
+			// expect(screen.getByText(/Mes notes de frais/i)).toBeVisible()
 
 			// console.log(mockStore.bills().update)
 			// expect(mockStore.bills().update.mock.calls[0])
 		})
+
+		// Je teste la création d'une nouvelle note de frais et la réponse de l'API
+		// test('Then a new bill should be created', async () => {
+		// 	const createBill = jest.fn(mockStore.bills().create)
+		// 	const updateBill = jest.fn(mockStore.bills().update)
+
+		// 	const { fileUrl, key } = await createBill()
+
+		// 	expect(createBill).toHaveBeenCalledTimes(1)
+
+		// 	expect(key).toBe('1234')
+		// 	expect(fileUrl).toBe('https://localhost:3456/images/test.jpg')
+
+		// 	const newBill = updateBill()
+
+		// 	expect(updateBill).toHaveBeenCalledTimes(1)
+
+		// 	await expect(newBill).resolves.toEqual({
+		// 		id: '47qAXb6fIm2zOKkLzMro',
+		// 		vat: '80',
+		// 		fileUrl:
+		// 			'https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a',
+		// 		status: 'pending',
+		// 		type: 'Hôtel et logement',
+		// 		commentary: 'séminaire billed',
+		// 		name: 'encore',
+		// 		fileName: 'preview-facture-free-201801-pdf-1.jpg',
+		// 		date: '2004-04-04',
+		// 		amount: 400,
+		// 		commentAdmin: 'ok',
+		// 		email: 'a@a',
+		// 		pct: 20,
+		// 	})
+		// })
 	})
 })

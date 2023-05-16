@@ -16,11 +16,27 @@ export default class NewBill {
 		this.billId = null
 		new Logout({ document, localStorage, onNavigate })
 	}
+
+	fileCheck = (file, target) => {
+		// Je verifie le type de fichier à uploader
+		const fileTypes = ['image/jpeg', 'image/jpg', 'image/png']
+
+		if (!fileTypes.includes(file.type)) {
+			this.document.getElementById('fileErrorMsg').innerHTML =
+				'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
+				target.value = ''
+			return false
+		}
+		this.document.getElementById('fileErrorMsg').innerHTML = ''
+		return true
+	}
+
 	handleChangeFile = (e) => {
 		e.preventDefault()
-		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
+		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide en créant une fonction  fileCkeck
 
 		// const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+		const target = e.target
 		const file = e.target.files[0]
 		// J'ajoute une condition pour vérifier qu'il y a bien une pièce jointe
 		if (!file) {
@@ -31,11 +47,13 @@ export default class NewBill {
 		const fileName = filePath[filePath.length - 1]
 		const formData = new FormData()
 		const email = JSON.parse(localStorage.getItem('user')).email
-		const fileErrorMsg = this.document.getElementById('fileErrorMsg')
-		fileErrorMsg.innerHTML = ''
+		
+		this.document.getElementById('fileErrorMsg').innerHTML = ''
+
 		formData.append('file', file)
 		formData.append('email', email)
-		if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
+		// Je vérifie que le fichier est bien au bon format grace à la méthode fileCheck
+		this.fileCheck(file, target) &&
 			this.store
 				.bills()
 				.create({
@@ -52,10 +70,6 @@ export default class NewBill {
 				.catch((error) => {
 					console.error(error)
 				})
-		} else {
-			this.showFileError(e)
-			e.target.value = ''
-		}
 	}
 	handleSubmit = (e) => {
 		e.preventDefault()
@@ -79,13 +93,6 @@ export default class NewBill {
 		}
 		this.updateBill(bill)
 		this.onNavigate(ROUTES_PATH['Bills'])
-	}
-
-	// Ajout d'une méthode d'affichage d'erreur si mauvais format de fichier
-	showFileError = (e) => {
-		e.preventDefault()
-		const extensionError = this.document.getElementById('fileErrorMsg')
-		extensionError.innerHTML = 'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
 	}
 
 	// not need to cover this function by tests
