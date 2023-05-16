@@ -163,12 +163,15 @@ describe('Given I am connected as an employee', () => {
 
 	describe('When I submit a new bill with all fields OK', () => {
 		test('Then It should create a bill', async () => {
+
+			// Je paramètre le local storage et la page du router pour simuler un employé connecté 
 			localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
+
+			// J'ai besoin d'émuler l'affichage de la page NewBill
 			const html = NewBillUI()
 			document.body.innerHTML = html
 
-			// window.onNavigate(ROUTES_PATH.NewBill)
-
+			// Je crée un mock d'une nouvelle instance de la classe NewBill
 			const newBill = new NewBill({
 				document,
 				onNavigate: () => {},
@@ -176,17 +179,20 @@ describe('Given I am connected as an employee', () => {
 				localStorage: window.localStorage,
 			})
 
+			// Je crée un espion sur la fonction handleChangeFile
 			const handleChangeFile = jest.spyOn(newBill, 'handleChangeFile')
 			const imageInput = screen.getByTestId('file')
 
 			imageInput.addEventListener('change', handleChangeFile)
 
-			// expect(handleChangeFile).toHaveBeenCalled()
+			// Je m'attends à être sur la page NewBill
 			expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
 
+			// Je crée un espion sur la fonction handleSubmit
 			const handleSubmit = jest.fn(newBill.handleSubmit)
 			const correctFile = new File(['img'], 'justif.png', { type: 'image/png' })
 
+			// Je peuple les champs du formulaire
 			fireEvent.change(screen.getByTestId('expense-type'), {
 				target: { value: 'Transports' },
 			})
@@ -208,21 +214,28 @@ describe('Given I am connected as an employee', () => {
 			fireEvent.change(screen.getByTestId('commentary'), {
 				target: { value: 'Vol reunion client USA' },
 			})
-			// fireEvent.change(screen.getByTestId('file'), {
-			// 	target: { value: 'justif.png' },
-			// })
 
+			// Je simule le chargement du fichier
 			await waitFor(() => {
 				userEvent.upload(imageInput, correctFile)
 			})
 
 			const form = screen.getByTestId('form-new-bill')
+			// Je crée un écouteur d'évènement sur le formulaire
 			form.addEventListener('submit', handleSubmit)
-			fireEvent.submit(form)
-			// expect(handleSubmit).toHaveBeenCalled()
 
-			console.log(mockStore.bills().update)
-			expect(mockStore.bills().update.mock.calls[0])
+			// Je simule la soumission du formulaire
+			fireEvent.submit(form)
+
+			// Je m'attends à ce que la fonction handleSubmit soit appelée
+			expect(handleSubmit).toHaveBeenCalled()
+
+			// Je m'attends à ce que les champs suivants contiennent une valeur valide
+			expect(screen.getByTestId('datepicker').validity.valueMissing).toBeFalsy()
+			expect(screen.getByTestId('expense-name').validity.valueMissing).toBeFalsy()
+
+			// console.log(mockStore.bills().update)
+			// expect(mockStore.bills().update.mock.calls[0])
 		})
 	})
 })
