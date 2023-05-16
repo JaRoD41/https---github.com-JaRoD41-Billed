@@ -17,6 +17,15 @@ import BillsUI from '../views/BillsUI.js'
 // Je simule l'API grâce à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
 
+const setNewBill = () => {
+	return new NewBill({
+		document,
+		onNavigate: () => {},
+		store: mockStore,
+		localStorage: window.localStorage,
+	})
+}
+
 const onNavigate = (pathname) => {
 	document.body.innerHTML = ROUTES({ pathname })
 }
@@ -163,9 +172,6 @@ describe('Given I am connected as an employee', () => {
 
 	describe('When I submit a new bill with all fields OK', () => {
 		test('Then It should accept the form and return to the Bills page ', async () => {
-			// // Je paramètre le local storage et la page du router pour simuler un employé connecté
-			// localStorage.setItem('user', JSON.stringify({ type: 'Employee', email: 'a@a' }))
-
 			// J'ai besoin d'émuler l'affichage de la page NewBill
 			const html = NewBillUI()
 			document.body.innerHTML = html
@@ -200,6 +206,9 @@ describe('Given I am connected as an employee', () => {
 
 			// Je crée un espion sur la fonction handleSubmit
 			const handleSubmit = jest.fn(newBill.handleSubmit)
+
+			// Je crée un espion sur la fonction fileCheck
+			const fileCheck = jest.spyOn(newBill, 'fileCheck')
 			const correctFile = new File(['img'], 'justif.png', { type: 'image/png' })
 
 			// Je peuple les champs du formulaire
@@ -225,10 +234,11 @@ describe('Given I am connected as an employee', () => {
 				target: { value: 'Vol reunion client USA' },
 			})
 
-			// // Je simule le chargement du fichier
-			// await waitFor(() => {
-			// 	userEvent.upload(imageInput, correctFile)
-			// })
+			newBill.fileName = correctFile.name
+
+			await waitFor(() => {
+				userEvent.upload(imageInput, correctFile)
+			})
 
 			const form = screen.getByTestId('form-new-bill')
 			// Je crée un écouteur d'évènement sur le formulaire
@@ -241,7 +251,9 @@ describe('Given I am connected as an employee', () => {
 			expect(screen.getByTestId('vat').validity.valueMissing).toBeFalsy()
 			expect(screen.getByTestId('pct').validity.valueMissing).toBeFalsy()
 			expect(screen.getByTestId('commentary').validity.valueMissing).toBeFalsy()
-			//expect(screen.getByTestId('file').validity.valueMissing).toBeFalsy()
+
+			// Je m'attends à ce que le champ file contienne le fichier correct
+			expect(fileCheck(correctFile)).toBeTruthy()
 
 			// Je m'attends à ce que le bouton d'envoi du formulaire soit présent
 			const submitButton = screen.getByRole('button', { name: /envoyer/i })
@@ -253,46 +265,75 @@ describe('Given I am connected as an employee', () => {
 
 			// Je m'attends à ce que la fonction handleSubmit soit appelée
 			expect(handleSubmit).toHaveBeenCalled()
-
-			// Je m'assure qu'on est bien renvoyé sur la page Bills
-			// expect(screen.getByText(/Mes notes de frais/i)).toBeVisible()
-
-			// console.log(mockStore.bills().update)
-			// expect(mockStore.bills().update.mock.calls[0])
 		})
 
 		// Je teste la création d'une nouvelle note de frais et la réponse de l'API
-		// test('Then a new bill should be created', async () => {
-		// 	const createBill = jest.fn(mockStore.bills().create)
-		// 	const updateBill = jest.fn(mockStore.bills().update)
+		test('Then a new bill should be created', async () => {
+			const createBill = jest.fn(mockStore.bills().create)
+			const updateBill = jest.fn(mockStore.bills().update)
 
-		// 	const { fileUrl, key } = await createBill()
+			// Je m'attends à ce que la fonction createBill soit appelée après avoir soumis le formulaire
+			const { fileUrl, key } = await createBill()
 
-		// 	expect(createBill).toHaveBeenCalledTimes(1)
+			expect(createBill).toHaveBeenCalledTimes(1)
 
-		// 	expect(key).toBe('1234')
-		// 	expect(fileUrl).toBe('https://localhost:3456/images/test.jpg')
+			// Je m'attends à ce que la clé et l'URL du fichier soient correctes
+			expect(key).toBe('1234')
+			expect(fileUrl).toBe('https://localhost:3456/images/test.jpg')
 
-		// 	const newBill = updateBill()
+			const newBill = updateBill()
 
-		// 	expect(updateBill).toHaveBeenCalledTimes(1)
+			expect(updateBill).toHaveBeenCalledTimes(1)
 
-		// 	await expect(newBill).resolves.toEqual({
-		// 		id: '47qAXb6fIm2zOKkLzMro',
-		// 		vat: '80',
-		// 		fileUrl:
-		// 			'https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a',
-		// 		status: 'pending',
-		// 		type: 'Hôtel et logement',
-		// 		commentary: 'séminaire billed',
-		// 		name: 'encore',
-		// 		fileName: 'preview-facture-free-201801-pdf-1.jpg',
-		// 		date: '2004-04-04',
-		// 		amount: 400,
-		// 		commentAdmin: 'ok',
-		// 		email: 'a@a',
-		// 		pct: 20,
-		// 	})
-		// })
+			// Je m'attends à ce que la nouvelle note de frais soit correcte
+			await expect(newBill).resolves.toEqual({
+				id: '47qAXb6fIm2zOKkLzMro',
+				vat: '80',
+				fileUrl:
+					'https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a',
+				status: 'pending',
+				type: 'Hôtel et logement',
+				commentary: 'séminaire billed',
+				name: 'encore',
+				fileName: 'preview-facture-free-201801-pdf-1.jpg',
+				date: '2004-04-04',
+				amount: 400,
+				commentAdmin: 'ok',
+				email: 'a@a',
+				pct: 20,
+			})
+		})
+	})
+
+	describe('When an error occurs on API', () => {
+		
+		test('Then there should be a new bill in Bills mock list', async () => {
+			// Je récupère la liste des notes de frais mockées
+			const bills = await mockStore.bills().list()
+
+			// Je m'attends à ce qu'il y ait 4 notes de frais
+			expect(bills.length).toEqual(4)
+
+			// Je crée une nouvelle note de frais
+			const newBillTest = {
+				email: 'employee@test.tld',
+				type: 'Transports',
+				name: 'Vol Paris-New York',
+				amount: '1375',
+				date: '2023-05-16',
+				vat: '255',
+				pct: '20',
+				commentary: 'Vol reunion client USA',
+				fileUrl: undefined,
+				fileName: 'test.png',
+				status: 'pending',
+			}
+
+			// J'ajoute la nouvelle note de frais dans la liste des bills mocked
+			mockStore.bills().create(newBillTest)
+
+			// Je m'attends à ce qu'il y ait maintenant 5 notes de frais
+			waitFor(() => expect(bills.length).toEqual(5))
+		})
 	})
 })

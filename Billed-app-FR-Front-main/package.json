@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"test": "jest --coverage --noStackTrace",
+		"test": "jest --coverage --noStackTrace --silent",
 		"server": "live-server"
 	},
 	"jest": {
@@ -36,3 +36,4 @@
 		"jest-html-reporter": "^3.1.3"
 	}
 }
+
