@@ -15,29 +15,26 @@ export default class NewBill {
 		this.fileUrl = null
 		this.fileName = null
 		this.billId = null
+		// Correction du bug 3 : J'initialise la variable fileIsOk à false
+		this.fileIsOk = false
 		new Logout({ document, localStorage, onNavigate })
 	}
 
 	handleChangeFile = (e) => {
 		e.preventDefault()
+		const file = e.target.files[0]
+		const fileName = e.target.files[0].name
+		const email = JSON.parse(localStorage.getItem('user')).email
+		const fileExtension = fileName.split('.').pop()
+
+		const formData = new FormData()
 		const errorMessageExtension = this.document.querySelector('.error-message')
-		// let file = e.target.files[0]
 
 		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
 
-		if (
-			this.document.querySelector(`input[data-testid="file"]`).files[0].type === 'image/jpeg' ||
-			this.document.querySelector(`input[data-testid="file"]`).files[0].type === 'image/jpg' ||
-			this.document.querySelector(`input[data-testid="file"]`).files[0].type === 'image/png'
-		) {
-			
+		if (fileExtension.match('(jpe?g|png)')) {
 			errorMessageExtension.classList.add('hidden')
-			const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-
-			const filePath = e.target.value.split(/\\/g)
-			const fileName = filePath[filePath.length - 1]
-			const formData = new FormData()
-			const email = JSON.parse(localStorage.getItem('user')).email
+			// const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
 
 			formData.append('file', file)
 			formData.append('email', email)
@@ -51,19 +48,24 @@ export default class NewBill {
 					},
 				})
 				.then(({ fileUrl, key }) => {
+					this.fileIsOk = true
 					this.billId = key
 					this.fileUrl = fileUrl
 					this.fileName = fileName
 				})
 				.catch((error) => {
+					this.fileIsOk = false
 					console.error(error)
+					return this.fileIsOk
 				})
 		} else {
 			// Si le fichier n'est pas au bon format, je vide le champ de fichier et affiche le message d'erreur
-			
+
 			errorMessageExtension.classList.remove('hidden')
-			// this.document.querySelector(`input[data-testid="file"]`).value = ''
+			e.target.value = ''
+			this.fileIsOk = false
 		}
+		return this.fileIsOk
 	}
 	handleSubmit = (e) => {
 		e.preventDefault()

@@ -256,73 +256,104 @@ describe('Given I am logged in as an employee', () => {
 				// Je m'attends à ce qu'il y ait 5 notes de frais à présent
 				waitFor(() => expect(bills.length).toEqual(5))
 			})
-			// // J'effectue les tests d'erreurs de l'API
-			// describe('When an error occurs on API', () => {
-			// 	// J'implémente un objet et un espion sur la méthode bills de l'API mockée avant chaque test
-			// 	beforeEach(() => {
-			// 		// Je crée un espion sur la méthode bills de l'API mockée
-			// 		jest.spyOn(mockStore, 'bills')
+			// J'effectue les tests d'erreurs de l'API
+			describe('When an error occurs on API', () => {
+				// J'implémente un objet et un espion sur la méthode bills de l'API mockée avant chaque test
+				beforeEach(() => {
+					// Je crée un espion sur la méthode bills de l'API mockée
+					jest.spyOn(mockStore, 'bills')
 
-			// 		// Je crée un objet localStorageMock simulant le localStorage
-			// 		Object.defineProperty(window, 'localStorage', {
-			// 			value: localStorageMock,
-			// 		})
-			// 		window.localStorage.setItem(
-			// 			'user',
-			// 			JSON.stringify({
-			// 				type: 'Employee',
-			// 				email: 'a@a',
-			// 			})
-			// 		)
+					// Je crée un objet localStorageMock simulant le localStorage
+					Object.defineProperty(window, 'localStorage', {
+						value: localStorageMock,
+					})
+					Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
+					window.localStorage.setItem(
+						'user',
+						JSON.stringify({
+							type: 'Employee',
+							email: 'a@a',
+						})
+					)
 
-			// 		// Je crée un DOM de test
-			// 		const root = document.createElement('div')
-			// 		root.setAttribute('id', 'root')
-			// 		document.body.appendChild(root)
-			// 		// J'utilise la fonction router pour simuler la navigation vers la page NewBill
-			// 		Router()
-			// 	})
-			// 	// Je teste l'erreur 404
-			// 	test('Then the API call fails with 404 error message', () => {
-			// 		// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
-			// 		mockStore.bills.mockImplementationOnce(() => {
-			// 			return {
-			// 				create: () => {
-			// 					return Promise.reject(new Error('Erreur 404'))
-			// 				},
-			// 			}
-			// 		})
+					// Je crée un DOM de test
+					document.body.innerHTML = `<div id="root"></div>`
+					// J'utilise la fonction router pour simuler la navigation vers la page NewBill
+					Router()
+				})
 
-			// 		// J'envoie l'erreur en paramètre de la fonction view de Bills
-			// 		document.body.innerHTML = BillsUI({ error: 'Erreur 404' })
+				// Je restore le console error après chaque test
+				afterAll(() => {
+					console.error.mockRestore()
+				})
 
-			// 		// Je recherche le message d'erreur
-			// 		const message = screen.getByText(/Erreur 404/)
+				test('Then the emulated page contains a file in the input', async () => {
+					// Création d'objet - Nouvelle note de frais
+					const newBillObject = new NewBill({
+						document,
+						onNavigate,
+						store: mockStore,
+						localStorage: window.localStorage,
+					})
+					// Je simule la fonction handleChangeFile qui est appelée lors du changement de fichier
+					const handleChangeFile = jest.fn((e) => newBillObject.handleChangeFile(e))
+					// Je crée la variable inputFile qui contient le champ file
+					const inputFile = screen.getByTestId('file')
+					// Je crée un fichier correct
+					const correctFile = new File(['img'], 'justif.png', { type: 'image/png' })
+					// Je crée un écouteur d'évènement sur le champ file
+					inputFile.addEventListener('change', handleChangeFile)
+					// Je simule le changement de fichier
+					await waitFor(() => {
+						userEvent.upload(inputFile, correctFile)
+					})
 
-			// 		// Je m'attends à ce qu'il soit bien affiché
-			// 		expect(message).toBeTruthy()
-			// 	})
-			// 	// Je teste l'erreur 500
-			// 	test('Then the API call fails with 500 error message', () => {
-			// 		// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
-			// 		mockStore.bills.mockImplementationOnce(() => {
-			// 			return {
-			// 				create: () => {
-			// 					return Promise.reject(new Error('Erreur 500'))
-			// 				},
-			// 			}
-			// 		})
+					// Je m'attends à ce que le fichier soit présent
+					expect(inputFile.files[0].name).toBe('justif.png')
+					// expect(correctFile).toBeDefined()
+				})
 
-			// 		// J'envoie l'erreur en paramètre de la fonction view de Bills
-			// 		document.body.innerHTML = BillsUI({ error: 'Erreur 500' })
+				// // Je teste l'erreur 404
+				// test('Then the API call fails with 404 error message', () => {
+				// 	// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
+				// 	mockStore.bills.mockImplementationOnce(() => {
+				// 		return {
+				// 			create: () => {
+				// 				return Promise.reject(new Error('Erreur 404'))
+				// 			},
+				// 		}
+				// 	})
 
-			// 		// Je recherche le message d'erreur
-			// 		const message = screen.getByText(/Erreur 500/)
+				// 	// J'envoie l'erreur en paramètre de la fonction view de Bills
+				// 	document.body.innerHTML = BillsUI({ error: 'Erreur 404' })
 
-			// 		// Je m'attends à ce qu'il soit bien affiché
-			// 		expect(message).toBeTruthy()
-			// 	})
-			// })
+				// 	// Je recherche le message d'erreur
+				// 	const message = screen.getByText(/Erreur 404/)
+
+				// 	// Je m'attends à ce qu'il soit bien affiché
+				// 	expect(message).toBeTruthy()
+				// })
+				// // Je teste l'erreur 500
+				// test('Then the API call fails with 500 error message', () => {
+				// 	// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
+				// 	mockStore.bills.mockImplementationOnce(() => {
+				// 		return {
+				// 			create: () => {
+				// 				return Promise.reject(new Error('Erreur 500'))
+				// 			},
+				// 		}
+				// 	})
+
+				// 	// J'envoie l'erreur en paramètre de la fonction view de Bills
+				// 	document.body.innerHTML = BillsUI({ error: 'Erreur 500' })
+
+				// 	// Je recherche le message d'erreur
+				// 	const message = screen.getByText(/Erreur 500/)
+
+				// 	// Je m'attends à ce qu'il soit bien affiché
+				// 	expect(message).toBeTruthy()
+				// })
+			})
 		})
 	})
 })
