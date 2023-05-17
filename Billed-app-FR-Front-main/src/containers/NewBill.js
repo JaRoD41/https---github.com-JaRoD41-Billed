@@ -9,67 +9,72 @@ export default class NewBill {
 		const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`)
 		formNewBill.addEventListener('submit', this.handleSubmit)
 		const file = this.document.querySelector(`input[data-testid="file"]`)
-
+		
+		console.log('file dans constructor :', file);
 		file.addEventListener('change', this.handleChangeFile)
+
 		this.fileUrl = null
 		this.fileName = null
 		this.billId = null
 		new Logout({ document, localStorage, onNavigate })
 	}
 
-	fileCheck = (file, target) => {
+	fileCheck = (file) => {
+		const errorMessage = this.document.querySelector('.error-message')
 		// Je verifie le type de fichier à uploader
 		const fileTypes = ['image/jpeg', 'image/jpg', 'image/png']
 
 		if (!fileTypes.includes(file.type)) {
-			this.document.getElementById('fileErrorMsg').innerHTML =
-				'Veuillez sélectionner un fichier au format png, jpeg ou jpg.'
-				target.value = ''
 			return false
 		}
-		this.document.getElementById('fileErrorMsg').innerHTML = ''
+		errorMessage.classList.add('hidden')
 		return true
 	}
 
 	handleChangeFile = (e) => {
 		e.preventDefault()
+		const errorMessage = this.document.querySelector('.error-message')
 		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide en créant une fonction  fileCkeck
 
-		// const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-		const target = e.target
-		const file = e.target.files[0]
+		const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+		console.log('file :', file)
+		// const file = e.target.files[0]
+
 		// J'ajoute une condition pour vérifier qu'il y a bien une pièce jointe
-		if (!file) {
-			// Si aucun fichier n'est sélectionné, ne rien faire
+		if (file) {
+			const filePath = e.target.value.split(/\\/g)
+			const fileName = filePath[filePath.length - 1]
+			const formData = new FormData()
+			const email = JSON.parse(localStorage.getItem('user')).email
+
+			formData.append('file', file)
+			formData.append('email', email)
+			// Je vérifie que le fichier est bien au bon format grace à la méthode fileCheck
+			if (this.fileCheck(file)) {
+				this.store
+					.bills()
+					.create({
+						data: formData,
+						headers: {
+							noContentType: true,
+						},
+					})
+					.then(({ fileUrl, key }) => {
+						this.billId = key
+						this.fileUrl = fileUrl
+						this.fileName = fileName
+					})
+					.catch((error) => {
+						console.error(error)
+					})
+			} else {
+				// Si le fichier n'est pas au bon format, je vide le champ de fichier
+				e.target.value = ''
+				errorMessage.classList.remove('hidden')
+			}
+		} else {
 			return
 		}
-		const filePath = e.target.value.split(/\\/g)
-		const fileName = filePath[filePath.length - 1]
-		const formData = new FormData()
-		const email = JSON.parse(localStorage.getItem('user')).email
-		
-		this.document.getElementById('fileErrorMsg').innerHTML = ''
-
-		formData.append('file', file)
-		formData.append('email', email)
-		// Je vérifie que le fichier est bien au bon format grace à la méthode fileCheck
-		this.fileCheck(file, target) &&
-			this.store
-				.bills()
-				.create({
-					data: formData,
-					headers: {
-						noContentType: true,
-					},
-				})
-				.then(({ fileUrl, key }) => {
-					this.billId = key
-					this.fileUrl = fileUrl
-					this.fileName = fileName
-				})
-				.catch((error) => {
-					console.error(error)
-				})
 	}
 	handleSubmit = (e) => {
 		e.preventDefault()

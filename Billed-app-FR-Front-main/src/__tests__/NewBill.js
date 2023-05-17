@@ -70,103 +70,107 @@ describe('Given I am connected as an employee', () => {
 	})
 })
 
-// describe('When I submit a file to join to the NewBill form', () => {
-// 	// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
-// 	beforeEach(() => {
-// 		// Je crée un objet localStorageMock simulant le localStorage
-// 		Object.defineProperty(window, 'localStorage', {
-// 			value: localStorageMock,
-// 		})
-// 		window.localStorage.setItem(
-// 			'user',
-// 			JSON.stringify({
-// 				type: 'Employee',
-// 				email: 'a@a',
-// 			})
-// 		)
-// 		// Je crée un DOM de test
-// 		const root = document.createElement('div')
-// 		root.setAttribute('id', 'root')
-// 		document.body.appendChild(root)
-// 		// J'utilise la fonction router pour simuler la navigation vers la page NewBill
-// 		Router()
-// 	})
+// ------------------ OK AVANT CES TESTS ------------------
 
-// 	test('Then an error message should be displayed and the file form should be reset in case of wrong extension', async () => {
-// 		// Navigation sur la page NewBills
-// 		window.onNavigate(ROUTES_PATH.NewBill)
+describe('When I submit a file to join to the NewBill form', () => {
+	// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
+	beforeEach(() => {
+		// Je crée un objet localStorageMock simulant le localStorage
+		Object.defineProperty(window, 'localStorage', {
+			value: localStorageMock,
+		})
+		window.localStorage.setItem(
+			'user',
+			JSON.stringify({
+				type: 'Employee',
+				email: 'a@a',
+			})
+		)
+		// Je crée un DOM de test
+		const root = document.createElement('div')
+		root.setAttribute('id', 'root')
+		document.body.appendChild(root)
+		// J'utilise la fonction router pour simuler la navigation vers la page NewBill
+		Router()
+	})
 
-// 		//Ajout de la view NewBill
-// 		document.body.innerHTML = NewBillUI()
+	test('Then an error message should be displayed and the file form should be reset in case of wrong extension', async () => {
+		// Navigation sur la page NewBills
+		window.onNavigate(ROUTES_PATH.NewBill)
 
-// 		// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
-// 		const newBill = new NewBill({ document, onNavigate: () => {}, store: mockStore, localStorage: window.localStorage })
-// 		// Je crée un spy sur la fonction fileCheck
-// 		const fileCheckSpy = jest.spyOn(newBill, 'fileCheck')
-// 		// Je crée un spy sur la fonction handleChangeFile
-// 		const handleChangeFileSpy = jest.spyOn(newBill, 'handleChangeFile')
-// 		// Je crée la variable inputFile qui contient le champ file
-// 		const inputFile = screen.getByTestId('file')
-// 		// Je crée un fichier incorrect
-// 		const wrongFile = new File(['img'], 'justif.webp', { type: 'image/webp' })
-// 		// Je crée un écouteur d'évènement sur le champ file
-// 		inputFile.addEventListener('change', handleChangeFileSpy)
-// 		// Je simule le changement de fichier
-// 		await waitFor(() => {
-// 			userEvent.upload(inputFile, wrongFile)
-// 		})
-// 		// Je crée la variable form qui contient le formulaire
-// 		const form = screen.getByTestId('form-new-bill')
-// 		// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
-// 		const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
-// 		// Je crée un écouteur d'évènement sur le formulaire
-// 		form.addEventListener('submit', handleSubmit)
+		//Ajout de la view NewBill
+		document.body.innerHTML = NewBillUI()
 
-// 		// Je m'attends à ce que le champ file contienne le fichier incorrect
-// 		expect(inputFile.files[0].name).toBe('justif.webp')
-// 		// Je m'attends à ce que le message d'erreur soit affiché
-// 		expect(fileCheckSpy).toHaveBeenCalled()
-// 		// Je m'attends à ce que la fonction handleChangeFile soit appelée
-// 		expect(handleChangeFileSpy).toHaveBeenCalled()
-// 		// Je m'attends à ce que la nouvelle facture avec la mauvaise pièce jointe ne soit pas validée
-// 		expect(newBill.validFile).not.toBeTruthy()
-// 	})
+		// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
+		const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage })
+		// Je crée un spy sur la fonction fileCheck
+		const fileCheckSpy = jest.spyOn(newBill, 'fileCheck')
+		// Je crée un spy sur la fonction handleChangeFile
+		const handleChangeFileSpy = jest.spyOn(newBill, 'handleChangeFile')
+		// Je crée la variable inputFile qui contient le champ file
+		const inputFile = screen.getByTestId('file')
+		// Je crée un fichier incorrect
+		const wrongFile = new File(['img'], 'justif.webp', { type: 'image/webp' })
+		// Je crée un écouteur d'évènement sur le champ file
+		inputFile.addEventListener('change', handleChangeFileSpy)
+		// Je simule le changement de fichier
+		await waitFor(() => {
+			userEvent.upload(inputFile, wrongFile)
+		})
+		// Je crée la variable form qui contient le formulaire
+		const form = screen.getByTestId('form-new-bill')
+		// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
+		const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+		// Je crée un écouteur d'évènement sur le formulaire
+		form.addEventListener('submit', handleSubmit)
 
-// 	// Je teste l'envoi du formulaire avec un fichier correct
-// 	test('Then the file should be uploaded in case of valid extension', async () => {
-// 		// Navigation sur la page NewBills
-// 		window.onNavigate(ROUTES_PATH.NewBill)
+		// Je m'attends à ce que le champ file contienne le fichier incorrect
+		expect(inputFile.files[0].name).toBe('justif.webp')
+		// Je m'attends à ce que le message d'erreur soit affiché
+		expect(fileCheckSpy).toHaveBeenCalled()
+		// Je m'attends à ce que la fonction handleChangeFile soit appelée
+		expect(handleChangeFileSpy).toHaveBeenCalled()
+		// Je m'attends à ce que la nouvelle facture avec la mauvaise pièce jointe ne soit pas validée
+		expect(newBill.validFile).not.toBeTruthy()
+	})
 
-// 		//Ajout de la view NewBill
-// 		document.body.innerHTML = NewBillUI()
+	// Je teste l'envoi du formulaire avec un fichier correct
+	test('Then the file should be uploaded in case of valid extension', async () => {
+		// Navigation sur la page NewBills
+		window.onNavigate(ROUTES_PATH.NewBill)
 
-// 		// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
-// 		const newBill = new NewBill({ document, onNavigate: () => {}, store: mockStore, localStorage: window.localStorage })
-// 		// Je crée un mock de la fonction create de bills
-// 		const createBillMock = jest.fn().mockResolvedValue({ fileUrl: 'test', key: 'test' })
-// 		newBill.store = { bills: () => ({ create: createBillMock }) }
-// 		// Je simule la fonction handleChangeFile qui est appelée lors du changement de fichier
-// 		const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
-// 		// Je crée la variable inputFile qui contient le champ file
-// 		const inputFile = screen.getByTestId('file')
-// 		// Je crée un fichier correct
-// 		const correctFile = new File(['img'], 'justif.png', { type: 'image/png' })
-// 		// Je crée un écouteur d'évènement sur le champ file
-// 		inputFile.addEventListener('change', handleChangeFile)
-// 		// Je simule le changement de fichier
-// 		await waitFor(() => {
-// 			userEvent.upload(inputFile, correctFile)
-// 		})
+		//Ajout de la view NewBill
+		document.body.innerHTML = NewBillUI()
 
-// 		// Je m'attends à ce que le champ file contienne le fichier correct
-// 		expect(inputFile.files[0].name).toBe('justif.png')
-// 		// Je m'attends à ce que la fonction create de bills soit appelée avec les bonnes données
-// 		expect(createBillMock).toHaveBeenCalledWith({
-// 			data: expect.any(FormData),
-// 			headers: { noContentType: true },
-// 		})
-// 	})
-// })
+		// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
+		const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage })
+		// Je crée un mock de la fonction create de bills
+		const createBillMock = jest.fn().mockResolvedValue({ fileUrl: 'test', key: 'test' })
+		newBill.store = { bills: () => ({ create: createBillMock }) }
+		// Je simule la fonction handleChangeFile qui est appelée lors du changement de fichier
+		const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
+		// Je crée la variable inputFile qui contient le champ file
+		const inputFile = screen.getByTestId('file')
+		// Je crée un fichier correct
+		const correctFile = new File(['img'], 'justif.png', { type: 'image/png' })
+		// Je crée un écouteur d'évènement sur le champ file
+		inputFile.addEventListener('change', handleChangeFile)
+		// Je simule le changement de fichier
+		await waitFor(() => {
+			userEvent.upload(inputFile, correctFile)
+		})
+
+		// Je m'attends à ce que le champ file contienne le fichier correct
+		expect(inputFile.files[0].name).toBe('justif.png')
+		// Je m'attends à ce que la fonction create de bills soit appelée avec les bonnes données
+		expect(createBillMock).toHaveBeenCalledWith({
+			data: expect.any(FormData),
+			headers: { noContentType: true },
+		})
+	})
+})
+
+// ------------------ OK APRES CES TESTS ------------------
 
 describe('When I submit a new bill with all fields OK', () => {
 	// Je teste la création d'une nouvelle note de frais et la réponse de l'API

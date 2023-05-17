@@ -62,6 +62,10 @@ textarea:focus, input:focus, select:focus {
   color: #0E5AE5 !important;
 }
 
-.redMsg {
+.error-message {
   color: red;
+}
+
+.hidden {
+  color: transparent;
 }
