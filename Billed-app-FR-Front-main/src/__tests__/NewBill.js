@@ -287,6 +287,7 @@ describe('Given I am logged in as an employee', () => {
 					console.error.mockRestore()
 				})
 
+				// ESSAI SIMUL TEST DEBUT
 				test('Then the emulated page contains a file in the input', async () => {
 					// Création d'objet - Nouvelle note de frais
 					const newBillObject = new NewBill({
@@ -312,47 +313,48 @@ describe('Given I am logged in as an employee', () => {
 					expect(inputFile.files[0].name).toBe('justif.png')
 					// expect(correctFile).toBeDefined()
 				})
+				// ESSAI SIMUL TEST FIN
 
-				// // Je teste l'erreur 404
-				// test('Then the API call fails with 404 error message', () => {
-				// 	// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
-				// 	mockStore.bills.mockImplementationOnce(() => {
-				// 		return {
-				// 			create: () => {
-				// 				return Promise.reject(new Error('Erreur 404'))
-				// 			},
-				// 		}
-				// 	})
+				// Je teste l'erreur 404
+				test('Then the API call fails with 404 error message', () => {
+					// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
+					mockStore.bills.mockImplementationOnce(() => {
+						return {
+							create: () => {
+								return Promise.reject(new Error('Erreur 404'))
+							},
+						}
+					})
 
-				// 	// J'envoie l'erreur en paramètre de la fonction view de Bills
-				// 	document.body.innerHTML = BillsUI({ error: 'Erreur 404' })
+					// J'envoie l'erreur en paramètre de la fonction view de Bills
+					document.body.innerHTML = BillsUI({ error: 'Erreur 404' })
 
-				// 	// Je recherche le message d'erreur
-				// 	const message = screen.getByText(/Erreur 404/)
+					// Je recherche le message d'erreur
+					const message = screen.getByText(/Erreur 404/)
 
-				// 	// Je m'attends à ce qu'il soit bien affiché
-				// 	expect(message).toBeTruthy()
-				// })
-				// // Je teste l'erreur 500
-				// test('Then the API call fails with 500 error message', () => {
-				// 	// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
-				// 	mockStore.bills.mockImplementationOnce(() => {
-				// 		return {
-				// 			create: () => {
-				// 				return Promise.reject(new Error('Erreur 500'))
-				// 			},
-				// 		}
-				// 	})
+					// Je m'attends à ce qu'il soit bien affiché
+					expect(message).toBeTruthy()
+				})
+				// Je teste l'erreur 500
+				test('Then the API call fails with 500 error message', () => {
+					// Je récupère les données mockées et j'applique la méthode create avec la simulation d'une erreur
+					mockStore.bills.mockImplementationOnce(() => {
+						return {
+							create: () => {
+								return Promise.reject(new Error('Erreur 500'))
+							},
+						}
+					})
 
-				// 	// J'envoie l'erreur en paramètre de la fonction view de Bills
-				// 	document.body.innerHTML = BillsUI({ error: 'Erreur 500' })
+					// J'envoie l'erreur en paramètre de la fonction view de Bills
+					document.body.innerHTML = BillsUI({ error: 'Erreur 500' })
 
-				// 	// Je recherche le message d'erreur
-				// 	const message = screen.getByText(/Erreur 500/)
+					// Je recherche le message d'erreur
+					const message = screen.getByText(/Erreur 500/)
 
-				// 	// Je m'attends à ce qu'il soit bien affiché
-				// 	expect(message).toBeTruthy()
-				// })
+					// Je m'attends à ce qu'il soit bien affiché
+					expect(message).toBeTruthy()
+				})
 			})
 		})
 	})
