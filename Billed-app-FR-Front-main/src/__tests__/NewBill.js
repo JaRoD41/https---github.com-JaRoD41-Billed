@@ -91,17 +91,8 @@ window.alert = jest.fn()
 // 	})
 
 describe('When I submit a file to join to the NewBill form', () => {
-	// // Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
-	// beforeEach(() => {
-	// 	Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-	// 	Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
-	// 	// Je simule un user connecté en temps qu'employé
-	// 	window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-	// 	document.body.innerHTML = `<div id="root"></div>`
-	// 	Router()
-	// })
-
-	test('Then an error message should be displayed and the file form should be reset in case of wrong extension', async () => {
+	// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
+	beforeEach(() => {
 		// Je crée un objet localStorageMock simulant le localStorage
 		Object.defineProperty(window, 'localStorage', {
 			value: localStorageMock,
@@ -119,14 +110,15 @@ describe('When I submit a file to join to the NewBill form', () => {
 		document.body.appendChild(root)
 		// J'utilise la fonction router pour simuler la navigation vers la page NewBill
 		Router()
+	})
 
+	test('Then an error message should be displayed and the file form should be reset in case of wrong extension', async () => {
 		// Navigation sur la page NewBills
 		window.onNavigate(ROUTES_PATH.NewBill)
 
 		//Ajout de la view NewBill
 		document.body.innerHTML = NewBillUI()
-		// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
-		const newBill = new NewBill({ document, onNavigate: () => {}, store: mockStore, localStorage: window.localStorage })
+
 		// Je crée un spy sur la fonction fileCheck
 		const fileCheckSpy = jest.spyOn(newBill, 'fileCheck')
 		// Je crée un spy sur la fonction handleChangeFile
@@ -160,24 +152,6 @@ describe('When I submit a file to join to the NewBill form', () => {
 
 	// Je teste l'envoi du formulaire avec un fichier correct
 	test('Then the file should be uploaded in case of valid extension', async () => {
-		// Je crée un objet localStorageMock simulant le localStorage
-		Object.defineProperty(window, 'localStorage', {
-			value: localStorageMock,
-		})
-		window.localStorage.setItem(
-			'user',
-			JSON.stringify({
-				type: 'Employee',
-				email: 'a@a',
-			})
-		)
-		// Je crée un DOM de test
-		const root = document.createElement('div')
-		root.setAttribute('id', 'root')
-		document.body.appendChild(root)
-		// J'utilise la fonction router pour simuler la navigation vers la page NewBill
-		Router()
-
 		// Navigation sur la page NewBills
 		window.onNavigate(ROUTES_PATH.NewBill)
 
