@@ -41,32 +41,33 @@ describe('Given I am connected as an employee', () => {
 		})
 	})
 
-	// 	describe('When I submit an empty form', () => {
-	// 		test('Then I should stay on the same page', () => {
-	// 			// Je simule un user connecté en temps qu'employé sur NewBill
-	// 			window.onNavigate(ROUTES_PATH.NewBill)
-	// 			// Je crée une facture vide
-	// 			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
-	// 			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
-	// 			expect(screen.getByTestId('expense-name').value).toBe('')
-	// 			expect(screen.getByTestId('datepicker').value).toBe('')
-	// 			expect(screen.getByTestId('amount').value).toBe('')
-	// 			expect(screen.getByTestId('vat').value).toBe('')
-	// 			expect(screen.getByTestId('pct').value).toBe('')
-	// 			expect(screen.getByTestId('file').value).toBe('')
-	// 			// Je crée la variable form qui contient le formulaire
-	// 			const form = screen.getByTestId('form-new-bill')
-	// 			// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
-	// 			const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
-	// 			// Je crée un écouteur d'évènement sur le formulaire
-	// 			form.addEventListener('submit', handleSubmit)
-	// 			// Je simule la soumission du formulaire
-	// 			fireEvent.submit(form)
-	// 			// Je m'attends à ce que la fonction handleSubmit soit appelée
-	// 			expect(handleSubmit).toHaveBeenCalled()
-	// 			// Je m'attends à ce que le formulaire soit OK
-	// 			expect(form).toBeTruthy()
-	// 		})
+	describe('When I submit an empty form', () => {
+		test('Then I should stay on the same page', () => {
+			// Je simule un user connecté en temps qu'employé sur NewBill
+			window.onNavigate(ROUTES_PATH.NewBill)
+			// Je crée une facture vide
+			const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage })
+			// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
+			expect(screen.getByTestId('expense-name').value).toBe('')
+			expect(screen.getByTestId('datepicker').value).toBe('')
+			expect(screen.getByTestId('amount').value).toBe('')
+			expect(screen.getByTestId('vat').value).toBe('')
+			expect(screen.getByTestId('pct').value).toBe('')
+			expect(screen.getByTestId('file').value).toBe('')
+			// Je crée la variable form qui contient le formulaire
+			const form = screen.getByTestId('form-new-bill')
+			// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
+			const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+			// Je crée un écouteur d'évènement sur le formulaire
+			form.addEventListener('submit', handleSubmit)
+			// Je simule la soumission du formulaire
+			fireEvent.submit(form)
+			// Je m'attends à ce que la fonction handleSubmit soit appelée
+			expect(handleSubmit).toHaveBeenCalled()
+			// Je m'attends à ce que le formulaire soit OK
+			expect(form).toBeTruthy()
+		})
+	})
 })
 
 // describe('When I submit a file to join to the NewBill form', () => {
