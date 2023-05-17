@@ -65,10 +65,3 @@ select:focus {
 *[placeholder] {
   color: #0E5AE5 !important;
 }
-
-.error-message {
-  display: none;
-  color: red;
-  font-weight: 500;
-  font-size: 14px;
-}

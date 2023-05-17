@@ -70,8 +70,6 @@ describe('Given I am connected as an employee', () => {
 	})
 })
 
-// ------------------ OK AVANT CES TESTS ------------------
-
 describe('When I submit a file to join to the NewBill form', () => {
 	// Je paramètre le local storage et la page du router pour simuler un user connecté grâce à beforeEach
 	beforeEach(() => {
@@ -103,9 +101,7 @@ describe('When I submit a file to join to the NewBill form', () => {
 
 		// Je récupère le html de la page NewBill contenant le formulaire et ses champs vides
 		const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage })
-		// Je crée un spy sur la fonction fileCheck
-		// const fileCheckSpy = jest.spyOn(newBill, 'fileCheck')
-		// // Je crée un spy sur la fonction handleChangeFile
+		// Je crée un spy sur la fonction handleChangeFile
 		const handleChangeFileSpy = jest.spyOn(newBill, 'handleChangeFile')
 		// Je crée la variable inputFile qui contient le champ file
 		const inputFile = screen.getByTestId('file')
@@ -164,15 +160,8 @@ describe('When I submit a file to join to the NewBill form', () => {
 
 		// Je m'attends à ce que le champ file contienne le fichier correct
 		expect(inputFile.files[0].name).toBe('justif.png')
-		// // Je m'attends à ce que la fonction create de bills soit appelée avec les bonnes données
-		// expect(createBillMock).toHaveBeenCalledWith({
-		// 	data: expect.any(FormData),
-		// 	headers: { noContentType: true },
-		// })
 	})
 })
-
-// ------------------ OK APRES CES TESTS ------------------
 
 describe('When I submit a new bill with all fields OK', () => {
 	// Je teste la création d'une nouvelle note de frais et la réponse de l'API
@@ -283,7 +272,6 @@ describe('Given I am logged in as an employee', () => {
 					console.error.mockRestore()
 				})
 
-				// ESSAI SIMUL TEST DEBUT
 				test('Then the emulated page contains a file in the input', async () => {
 					// Création d'objet - Nouvelle note de frais
 					const newBillObject = new NewBill({
@@ -307,9 +295,7 @@ describe('Given I am logged in as an employee', () => {
 
 					// Je m'attends à ce que le fichier soit présent
 					expect(inputFile.files[0].name).toBe('justif.png')
-					// expect(correctFile).toBeDefined()
 				})
-				// ESSAI SIMUL TEST FIN
 
 				// Je teste l'erreur 404
 				test('Then the API call fails with 404 error message', () => {

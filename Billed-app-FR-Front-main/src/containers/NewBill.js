@@ -29,7 +29,7 @@ export default class NewBill {
 
 		const formData = new FormData()
 
-		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
+		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas jpg, jpeg ou png
 
 		if (fileExtension.match('(jpe?g|png)')) {
 			formData.append('file', file)
