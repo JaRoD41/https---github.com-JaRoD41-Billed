@@ -67,12 +67,8 @@ select:focus {
 }
 
 .error-message {
-  display: block;
+  display: none;
   color: red;
   font-weight: 500;
   font-size: 14px;
-}
-
-.hidden {
-  display: none;
 }

@@ -28,14 +28,10 @@ export default class NewBill {
 		const fileExtension = fileName.split('.').pop()
 
 		const formData = new FormData()
-		const errorMessageExtension = this.document.querySelector('.error-message')
 
 		// Correction du bug 3 : J'affiche un message d'erreur à l'utilisateur si le format de la pièce jointe n'est pas valide
 
 		if (fileExtension.match('(jpe?g|png)')) {
-			// errorMessageExtension.classList.add('hidden')
-			// const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-
 			formData.append('file', file)
 			formData.append('email', email)
 
@@ -59,20 +55,17 @@ export default class NewBill {
 					return this.fileIsOk
 				})
 		} else {
-			// Si le fichier n'est pas au bon format, je vide le champ de fichier et affiche le message d'erreur
-
-			errorMessageExtension.classList.remove('hidden')
+			// Si le fichier n'est pas au bon format, je vide le champ du fichier et affiche une alerte à l'utilisateur
+			alert('Veuillez sélectionner un fichier au format png, jpeg ou jpg.')
 			e.target.value = ''
 			this.fileIsOk = false
 		}
 		return this.fileIsOk
 	}
+
 	handleSubmit = (e) => {
 		e.preventDefault()
-		// console.log(
-		// 	'e.target.querySelector(`input[data-testid="datepicker"]`).value',
-		// 	e.target.querySelector(`input[data-testid="datepicker"]`).value
-		// )
+
 		const email = JSON.parse(localStorage.getItem('user')).email
 		const bill = {
 			email,

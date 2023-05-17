@@ -118,9 +118,7 @@ describe('When I submit a file to join to the NewBill form', () => {
 				files: [new File(['Test'], 'test.webp', { type: 'image/webp' })],
 			},
 		})
-		// await waitFor(() => {
-		// 	userEvent.upload(inputFile, wrongFile)
-		// })
+
 		// Je crée la variable form qui contient le formulaire
 		const form = screen.getByTestId('form-new-bill')
 		// Je simule la fonction handleSubmit qui est appelée lors de la soumission du formulaire
@@ -131,9 +129,7 @@ describe('When I submit a file to join to the NewBill form', () => {
 		// Je m'attends à ce que le champ file contienne le fichier incorrect
 		expect(inputFile.files[0].name).toBe('test.webp')
 		// Je m'attends à ce que le message d'erreur soit affiché
-		// Récupération du message d'erreur
-		const errorMessage = screen.getByTestId('file-error-message')
-		expect(errorMessage).not.toHaveClass('hidden')
+		expect(handleChangeFileSpy).toHaveReturnedWith(false)
 		// Je m'attends à ce que la fonction handleChangeFile soit appelée
 		expect(handleChangeFileSpy).toHaveBeenCalled()
 		// Je m'attends à ce que la nouvelle facture avec la mauvaise pièce jointe ne soit pas validée
