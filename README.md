@@ -13,14 +13,15 @@
 Vous êtes développeur front-end chez Billed, une entreprise qui produit des solutions Saas destinées aux équipes de ressources humaines.
 Malheureusement pour Billed, Garance, une collègue de la feature team “note de frais” a quitté l’entreprise avant d’avoir terminé l’application. Dans deux semaines, l’équipe doit montrer la solution qui fonctionne à l’ensemble de l’entreprise. Matthieu, Lead Developer de la feature team a demandé à être aidé pour tenir les délais et vous avez appris hier lors de la réunion d’équipe que c’est vous qui avez été désigné !
 
+
 ## Author
 
 - Laurent TRINCO
 
 ## Installation
 
-- Front : `npm install` Puis allez à l'adresse : http://127.0.0.1:8080/
-- Back : `npm install` puis `npm run run:dev` <br>
+- Front : `npm install` puis se placer dans le répertoire `Billed-app-FR-Front` et lancer `live-server` <br>
+- Back : `npm install` puis se placer dans le répertoire `Billed-app-FR-Back` et lancer `npm run run:dev` <br>
 L'api est accessible sur le port 5678 en local, c'est à dire http://localhost:5678
 
 ## Technos
@@ -38,9 +39,14 @@ L'api est accessible sur le port 5678 en local, c'est à dire http://localhost:5
 - Un screenshot au format PNG du rapport de couverture Jest.
 - Un document au format PDF du plan de tests End-To-End pour le parcours employé.
 
+<p align="center">
+  <img src="https://user.oc-static.com/upload/2020/08/14/1597396368627_image2.png">
+</p>
+
 ## Compétences évaluées
 
 - Débugger une application web avec le Chrome Debugger
 - Ecrire des tests unitaires avec JavaScript
 - Ecrire des tests d'intégration avec JavaScript
+- Couverture des tests souhaitée : au moins 80% de lignes de code
 - Rédiger un plan de test end-to-end manuel
