@@ -40,7 +40,7 @@ L'api est accessible sur le port 5678 en local, c'est à dire http://localhost:5
 - Un document au format PDF du plan de tests End-To-End pour le parcours employé.
 
 <p align="center">
-  <img src="https://user.oc-static.com/upload/2020/08/14/1597396368627_image2.png">
+  <img src="https://user.oc-static.com/upload/2020/08/14/15973967670682_image1.png">
 </p>
 
 ## Compétences évaluées
