@@ -37,6 +37,7 @@ describe('Given I am connected as an employee', () => {
 			window.onNavigate(ROUTES_PATH.Bills)
 			await waitFor(() => screen.getByTestId('icon-window'))
 			const windowIcon = screen.getByTestId('icon-window')
+			// J'ajoute EXPECT au test pour vérifier que l'icone de la page active est bien celle de la page des notes de frais
 			expect(windowIcon.classList.contains('active-icon')).toBeTruthy()
 		})
 		test('Then bills should be ordered from earliest to latest', () => {
