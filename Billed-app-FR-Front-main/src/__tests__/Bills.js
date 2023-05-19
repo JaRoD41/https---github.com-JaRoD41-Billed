@@ -16,6 +16,7 @@ import router from '../app/Router.js'
 
 // j'ai besoin de simuler l'API grace à la fonction mock qui va se substituer au fichier Store.js
 jest.mock('../app/Store.js', () => mockStore)
+// J'émule la fonction formatDate pour éviter les erreurs et tester le datepicker 
 jest.mock('../app/format.js', () => ({
 	formatDate: jest.fn(),
 }))

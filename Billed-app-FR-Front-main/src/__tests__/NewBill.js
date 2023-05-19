@@ -9,7 +9,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import NewBillUI from '../views/NewBillUI.js'
 import NewBill from '../containers/NewBill.js'
 import { localStorageMock } from '../__mocks__/localStorage'
-import { ROUTES, ROUTES_PATH } from '../constants/routes'
+import { ROUTES_PATH } from '../constants/routes'
 import Router from '../app/Router'
 import BillsUI from '../views/BillsUI.js'
 
@@ -204,7 +204,7 @@ describe('When I submit a new bill with all fields OK', () => {
 
 // -------------------------------------------------------------------------------
 
-// Ajout des tests d'implémentation POST
+// Ajout des tests d'intégration POST
 
 describe('Given I am logged in as an employee', () => {
 	describe('When I am on NewBill Page', () => {
